@@ -2,13 +2,13 @@
 
 #' Get a reasonable number for mc.cores
 #'
-#' @param max_cores Max number of cores this function will return
+#' @param max_cores Max number of cores this function will return (default 4)
 #' @return An integer number of cores to use
 #' @export
-get_cores <- function(max_cores = 10L) {
+get_cores <- function(max_cores = 4L) {
   # Find how many cores the machine has, counting only physical (rather than
-  # logical) cores. That is, ignore hyperthreading. Don't automatically use > 10.
-  # (You can still specify mc.cores > 10 in the function call.)
+  # logical) cores. That is, ignore hyperthreading. Don't automatically use > 4.
+  # (You can still specify mc.cores > 4 in the function call.)
   cores <- min(parallel::detectCores(logical = FALSE), max_cores, na.rm = TRUE)
   if (is.na(cores)) {
     cores <- 1L

@@ -4,10 +4,10 @@
 \alias{get_cores}
 \title{Get a reasonable number for mc.cores}
 \usage{
-get_cores(max_cores = 10L)
+get_cores(max_cores = 4L)
 }
 \arguments{
-\item{max_cores}{Max number of cores this function will return}
+\item{max_cores}{Max number of cores this function will return (default 4)}
 }
 \value{
 An integer number of cores to use

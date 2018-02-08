@@ -122,7 +122,7 @@ make_join_safer <- function(join_fn, fast = TRUE) {
       }
 
       if (! is_id(x, by_x)) {
-        # iff x isn't IDed by the by_x variables, then turn to y  
+        # iff x isn't IDed by the by_x variables, then turn to y
         if (! is_id(y, by_y)) {
           err_msg <- paste("Neither table is uniquely identified by",
                            "their 'by' variables!")
@@ -142,10 +142,3 @@ make_join_safer <- function(join_fn, fast = TRUE) {
     return(thorough_join_fn)
   }
 }
-
-
-# Raise an error for many-to-many joins, rather than returning the cartesian product.
-inner_join <- make_join_safer(dplyr::inner_join)
-left_join  <- make_join_safer(dplyr::left_join)
-right_join <- make_join_safer(dplyr::right_join)
-full_join  <- make_join_safer(dplyr::full_join)

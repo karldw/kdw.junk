@@ -1,4 +1,4 @@
-Package: kdw
+Package: kdw.junk
 Title: Miscellaneous Functions Karl Found Useful
 Version: 0.0.1
 Authors@R: person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("aut", "cre"))
@@ -16,4 +16,5 @@ Imports:
     jsonlite,
     purrr,
     tidyselect,
-    rlang
+    rlang,
+    glue
