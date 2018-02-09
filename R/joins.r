@@ -17,7 +17,7 @@ force_names.default <- function(x) {
 }
 
 force_names.tbl_lazy <- function(x) {
-  x_header <- dplyr::collect(head(x, 0))
+  x_header <- dplyr::collect(utils::head(x, 0))
   names(x_header)
 }
 
@@ -33,13 +33,14 @@ force_nrow <- function(.tbl) {
   UseMethod("force_nrow")
 }
 
-force_names.default <- function(.tbl) {
+force_nrow.default <- function(.tbl) {
   nrow(.tbl)
 }
 
-force_names.tbl_lazy <- function(.tbl) {
-  x_nrow <- dplyr::transmute(dplyr::ungroup(.tbl), n = dplyr::n())
-  dplyr::collect(x_nrow)$n
+force_nrow.tbl_lazy <- function(.tbl) {
+  n <- dplyr::n  # doesn't do anything except satisfy R CMD CHECK
+  x_nrow <- dplyr::summarize(dplyr::ungroup(.tbl), n = n())
+  res <- dplyr::collect(x_nrow)$n
 }
 
 
