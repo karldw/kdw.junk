@@ -12,10 +12,12 @@ force_names <- function(x) {
   UseMethod("force_names")
 }
 
+#' @export
 force_names.default <- function(x) {
   names(x)
 }
 
+#' @export
 force_names.tbl_lazy <- function(x) {
   x_header <- dplyr::collect(utils::head(x, 0))
   names(x_header)

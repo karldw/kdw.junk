@@ -15,8 +15,8 @@ is_id <- function(df, ..., notifier = base::warning) {
   UseMethod("is_id")
 }
 
+#' @export
 is_id.data.frame <- function(df, ..., notifier = base::warning) {
-  # TODO: write a version of this that works for databases
   claimed_id_vars <- tidyselect::vars_select(names(df), ...)
 
   stopifnot(is.character(claimed_id_vars), length(claimed_id_vars) > 0,
@@ -26,11 +26,11 @@ is_id.data.frame <- function(df, ..., notifier = base::warning) {
   if (length(not_found_vars) > 0) {
     err_msg <- sprintf("Claimed ID vars not in dataset: %s",
                        paste(not_found_vars, collapse = ", "))
-      notifier(err_msg)
+    notifier(err_msg)
     return(FALSE)
   }
 
-  df_id_cols_only <- dplyr::select_(df, .dots = claimed_id_vars)
+  df_id_cols_only <- dplyr::ungroup(dplyr::select(df, claimed_id_vars))
   id_cols_with_na <- purrr::map_lgl(df_id_cols_only, anyNA)
   if (any(id_cols_with_na)) {
     err_msg <- paste("ID variables cannot be NA. Problem variables:",
@@ -49,8 +49,41 @@ is_id.data.frame <- function(df, ..., notifier = base::warning) {
   return(ids_are_unique)
 }
 
+#' @export
 is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
-  stop("Not yet implemented.")
+
+  df_names <- force_names(df)
+  claimed_id_vars <- tidyselect::vars_select(df_names, ...)
+
+  stopifnot(is.character(claimed_id_vars), length(claimed_id_vars) > 0,
+            is.function(notifier))
+
+  not_found_vars <- base::setdiff(claimed_id_vars, df_names)
+  if (length(not_found_vars) > 0) {
+    err_msg <- sprintf("Claimed ID vars not in dataset: %s",
+                       paste(not_found_vars, collapse = ", "))
+    notifier(err_msg)
+    return(FALSE)
+  }
+  any_vars <- dplyr::any_vars  # does nothing except satisfy R CMD CHECK
+  df_id_cols_only <- dplyr::ungroup(dplyr::select(df, claimed_id_vars))
+  df_nas <- dplyr::filter_all(df_id_cols_only, any_vars(is.na(.)))
+  df_nas_nrow <- force_nrow(dplyr::head(df_nas, 1))
+  # If the df_nas table has any rows, at least one ID variable contains NAs
+  if (df_nas_nrow > 0) {
+    # TODO: it would be nice to say which variables contain NA
+    notifier("ID variables cannot be NA.")
+    return(FALSE)
+  }
+
+  total_row_count <- force_nrow(df_id_cols_only)
+  if (total_row_count == 0) {
+    notifier("No rows!")
+    return(FALSE)
+  }
+  nrow_distinct <- force_nrow(dplyr::distinct(df_id_cols_only))
+
+  nrow_distinct == total_row_count
 }
 
 
