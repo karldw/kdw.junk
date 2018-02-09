@@ -9,20 +9,23 @@ make_join_safer(join_fn, fast = TRUE)
 \arguments{
 \item{join_fn}{Original join function to wrap}
 
-\item{fast}{Boolean, should the check be fast or extra-thorough (defaults to TRUE)}
+\item{fast}{Boolean, should the check be fast or thorough (defaults to fast)}
 }
 \value{
 A new join function
 
 The new join function will have arguments \code{x}, \code{y}, \code{by}, \code{...} and
-\code{allow_cartesian = FALSE}. The goal here is to emulate \code{\link[=merge]{merge()}}, which will raise an
-error if rows aren't uniquely identified. Instead, dplyr follows SQL and does a
-cartesian join if rows aren't unique.
+\code{allow_cartesian = FALSE}. The goal here is to emulate \code{\link[=merge]{merge()}}, which will
+raise an error if rows aren't uniquely identified. Instead, dplyr follows SQL
+and does a cartesian join if rows aren't unique.
 
-If fast == TRUE, do the join, then check that the number of rows is not greater than
-the sum of the row counts of the input tables.
-If fast == FALSE, make sure that the by variables uniquely identify rows in at least
-one of the tables before doing the join.
+Additionally, the \code{by} variables are required. They cannot be implicit.
+The \code{...} arguments are passed to the dplyr join function.
+
+If fast == TRUE, do the join, then check that the number of rows is not
+greater than the sum of the row counts of the input tables.
+If fast == FALSE, make sure that the by variables uniquely identify rows in
+at least one of the tables before doing the join.
 }
 \description{
 Make a join function safer.
