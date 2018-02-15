@@ -68,7 +68,7 @@ is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
   any_vars <- dplyr::any_vars  # does nothing except satisfy R CMD CHECK
   df_id_cols_only <- dplyr::ungroup(dplyr::select(df, claimed_id_vars))
   df_nas <- dplyr::filter_all(df_id_cols_only, any_vars(is.na(.)))
-  df_nas_nrow <- force_nrow(dplyr::head(df_nas, 1))
+  df_nas_nrow <- force_nrow(utils::head(df_nas, 1))
   # If the df_nas table has any rows, at least one ID variable contains NAs
   if (df_nas_nrow > 0) {
     # TODO: it would be nice to say which variables contain NA
