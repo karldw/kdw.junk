@@ -259,6 +259,7 @@ is_rstudio <- function() {
 #' The `gues_max` parameter is set so high because computers are fast and I've
 #' had a lot of issues with datasets that have blank cells for several thousand
 #' rows (which read_excel reads as logical).
+#' @export
 read_data <- function(file, ..., guess_max = 1e6) {
   ext <- tolower(tools::file_ext(file))
   # Figure out what function to read.
