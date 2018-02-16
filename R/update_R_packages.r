@@ -46,19 +46,6 @@ update_packages <- function(repos = getOption("repos"), checkBuilt = TRUE, verbo
   invisible(ret)
 }
 
-#' Message to the user
-#'
-#' @param ... Arguments to `message`
-#' @param verbose Actually use `message`? (default TRUE)
-#' @return NULL
-#' Just a thin wrapper around [message()]
-narrate <- function(..., verbose = TRUE) {
-  if (verbose) {
-    message(...)
-  }
-  invisible()
-}
-
 
 #' Find installed packages that depend on Rcpp
 #'
