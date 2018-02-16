@@ -280,3 +280,18 @@ read_data <- function(file, ..., guess_max = 1e6) {
   }
   read_fn(...)
 }
+
+
+#' Message to the user
+#'
+#' @param ... Arguments to `message`
+#' @param verbose Actually use `message`? (default TRUE)
+#' @return NULL
+#' Just a thin wrapper around [message()]
+#' @export
+narrate <- function(..., verbose = TRUE) {
+  if (verbose) {
+    message(...)
+  }
+  invisible()
+}
