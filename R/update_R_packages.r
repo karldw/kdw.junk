@@ -9,6 +9,7 @@
 #'
 #' This version of update_packages goes the extra step of reinstalling all packages that
 #' depend on Rcpp whenever Rcpp is updated.
+#' @export
 update_packages <- function(repos = getOption("repos"), checkBuilt = TRUE, verbose = TRUE) {
   if (length(repos) > 1) {
     repos <- repos[1]
