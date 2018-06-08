@@ -182,17 +182,31 @@ is.connection <- function(x) {
 #'
 #' @param plt The plot created by [ggplot2::ggplot()]
 #' @param filename The filename to save (save type depends on extension)
-#' @param scale_mult A scale multiplier on the size. Defaults to 1; bigger numbers use a larger canvas.
+#' @param scale_mult A scale multiplier on the size. Defaults to 1; bigger
+#' numbers use a larger canvas.
+#' @param bg The background color, passed to the cairo_pdf device. The default
+#' is "white". If set to "transparent", the plot will be modified to make the
+#' `panel.background`, `plot.background`, `legend.background`, and
+#' `legend.box.background` transparent as well.
 #' @return The plot (invisibly)
 #' @seealso [ggplot2::ggsave()]
 #' @export
-save_plot <- function(plt, filename, scale_mult = 1) {
+save_plot <- function(plt, filename, scale_mult = 1, bg = "white") {
   stopifnot(dir.exists(dirname(filename)))
+  if (identical(bg, "transparent")) {
+    plt <- plt + ggplot2::theme(
+      # Borrowed from https://stackoverflow.com/a/41878833
+      panel.background      = ggplot2::element_rect(fill = "transparent", color = NA),
+      plot.background       = ggplot2::element_rect(fill = "transparent", color = NA),
+      legend.background     = ggplot2::element_rect(fill = "transparent", color = NA),
+      legend.box.background = ggplot2::element_rect(fill = "transparent", color = NA)
+    )
+  }
   # Save in the ratio of a beamer slide.
   # This aspect ratio works pretty well for normal latex too
   ggplot2::ggsave(filename = filename, plot = plt,
     width = 6.3 * scale_mult, height = 3.54 * scale_mult, units = "in",
-    device = grDevices::cairo_pdf)
+    device = grDevices::cairo_pdf, bg = bg)
   invisible(plt)
 }
 
