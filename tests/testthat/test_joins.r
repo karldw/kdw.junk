@@ -25,17 +25,28 @@ test_that("make_join_safer works for full_join", {
 })
 
 
-# set up mtcars_db
-con <- DBI::dbConnect(RSQLite::SQLite(), path = ":memory:")
-dplyr::copy_to(con, mtcars, "mtcars")
-mtcars_db <- dplyr::tbl(con, "mtcars")
+set_up_db <- function() {
+  # set up mtcars_db
+  con <- DBI::dbConnect(RSQLite::SQLite(), path = ":memory:")
+  dplyr::copy_to(con, mtcars, "mtcars")
+  con
+}
 
 test_that("force_nrow works", {
+  skip_if_not_installed("RSQLite")
+  con <- set_up_db()
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  mtcars_db <- dplyr::tbl(con, "mtcars")
   expect_equal(nrow(mtcars), force_nrow(mtcars))
   expect_equal(nrow(mtcars), force_nrow(mtcars_db))
 })
 
 test_that("force_names works", {
+  skip_if_not_installed("RSQLite")
+  set_up_db()
+  con <- set_up_db()
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  mtcars_db <- dplyr::tbl(con, "mtcars")
   expect_equal(names(mtcars), force_names(mtcars))
   expect_equal(names(mtcars), force_names(mtcars_db))
 })
