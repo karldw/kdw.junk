@@ -4,14 +4,20 @@
 \alias{save_plot}
 \title{Save a ggplot plot}
 \usage{
-save_plot(plt, filename, scale_mult = 1)
+save_plot(plt, filename, scale_mult = 1, bg = "white")
 }
 \arguments{
 \item{plt}{The plot created by \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}}
 
 \item{filename}{The filename to save (save type depends on extension)}
 
-\item{scale_mult}{A scale multiplier on the size. Defaults to 1; bigger numbers use a larger canvas.}
+\item{scale_mult}{A scale multiplier on the size. Defaults to 1; bigger
+numbers use a larger canvas.}
+
+\item{bg}{The background color, passed to the cairo_pdf device. The default
+is "white". If set to "transparent", the plot will be modified to make the
+\code{panel.background}, \code{plot.background}, \code{legend.background}, and
+\code{legend.box.background} transparent as well.}
 }
 \value{
 The plot (invisibly)
