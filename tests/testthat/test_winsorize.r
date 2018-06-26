@@ -22,3 +22,8 @@ test_that("winsorize works with floats", {
   x <- c(rep(0, 10), 1:10) + 0.1
   expect_equal(winsorize(x, trim = 0.1), c(rep(0.1, 10), 1:7 + 0.1, 8.1, 8.1, 8.1))
 })
+
+test_that("winsorize works with S3 classes", {
+  x <- as.Date(1:1000, origin = "1970-01-01")
+  expect_silent(winsorize(x))
+})

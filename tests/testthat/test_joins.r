@@ -43,7 +43,6 @@ test_that("force_nrow works", {
 
 test_that("force_names works", {
   skip_if_not_installed("RSQLite")
-  set_up_db()
   con <- set_up_db()
   on.exit(DBI::dbDisconnect(con), add = TRUE)
   mtcars_db <- dplyr::tbl(con, "mtcars")
