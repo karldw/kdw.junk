@@ -51,7 +51,7 @@ is_id.data.frame <- function(df, ..., notifier = base::warning) {
 
 #' @export
 is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
-
+  `.` <- NULL # make R CMD CHECK happy.
   df_names <- force_names(df)
   claimed_id_vars <- tidyselect::vars_select(df_names, ...)
 
