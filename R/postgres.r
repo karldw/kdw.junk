@@ -99,6 +99,7 @@ pg_add_index <- function(con, table_name, indexed_col, unique_index = FALSE,
   invisible()
 }
 
+
 #' Run the VACUUM command, and maybe ANALYZE too.
 #'
 #' @param con A DBI connection to a postgresql database

@@ -309,3 +309,70 @@ narrate <- function(..., verbose = TRUE) {
   }
   invisible()
 }
+
+
+#' Turn a vector into one long string, used to generate messages
+#'
+#' @param x Vector to convert
+#' @param quoted Should the individual elements have quotes around them?
+#' @param add_and Should we add an 'and' before the last element
+#' @return A string (length 1 character vector)
+#' @example
+#' vec2string(c(1,2,3)) == "'1', '2', and '3'"
+#' @export
+vec2string <- function(x, quoted = TRUE, add_and = TRUE) {
+  # Like the toString function, but better
+  stopifnot(length(x) > 0, is.logical(quoted), is.logical(add_and))
+  if (quoted) {
+    collapse_pattern <- "', '"
+    sprintf_pattern <- "'%s'"
+  } else {
+    collapse_pattern <- ", "
+    sprintf_pattern <- "%s"
+  }
+  end <- length(x)
+  if (end == 1) {
+    return(sprintf(sprintf_pattern, x))
+  }
+  first_elements <- x[-end]
+  last_element <- x[[end]]
+  if (add_and && end > 2) {
+    last_element <- paste(' and', sprintf(sprintf_pattern, last_element))
+  } else {
+    last_element <- paste(',', sprintf(sprintf_pattern, last_element))
+  }
+  first_elements <- sprintf(sprintf_pattern, paste(first_elements,
+                                                   collapse = collapse_pattern))
+  out <- paste0(first_elements, last_element)
+  out
+}
+
+#' Make felm slightly easier to use for someone who forgets to check things
+#'
+#' @param formula A formula to estimate
+#' @param data Data to use
+#' @param ... Passed to [lfe::felm()]
+#' @param dates_as_factor Should dates be converted to factors before running felm? (Default true)
+#' @param strict Should felm's warnings be treated as errors? Default true.
+#' @return The result from `felm()`
+#' @example
+#' felm_strict(cyl ~ wt, mtcars)
+#' @export
+felm_strict <- function(formula, data, ..., dates_as_factor = TRUE, strict = TRUE) {
+  if (strict) {
+    # Just like normal felm, but stricter about warnings.
+    # (these are almost always a serious problem and should be treated as errors)
+    orig_warn <- getOption('warn')
+    on.exit(options(warn = orig_warn), add = TRUE)
+    options(warn = 2)
+  }
+  is_date <- function(x) {
+    methods::is(x, "Date")
+  }
+  model_data <- stats::model.frame(formula, data)
+  if (dates_as_factor) {
+    # Force date variables to be factor if they're Dates and in the formula
+    data <- dplyr::mutate_if(data, is_date, as.factor)
+  }
+  return(lfe::felm(formula = formula, data = model_data, ...))
+}

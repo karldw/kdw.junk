@@ -1,6 +1,6 @@
 Package: kdw.junk
 Title: Miscellaneous Functions Karl Found Useful
-Version: 0.0.6
+Version: 0.0.7
 Authors@R: person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("aut", "cre"))
 Description: A variety of functions, mostly interacting with the tidyverse.
 Depends: R (>= 3.3.0)
@@ -17,6 +17,7 @@ Imports:
     rlang,
     glue
 Suggests:
+    methods,
     testthat,
     DBI,
     dbplyr,
@@ -28,4 +29,5 @@ Suggests:
     feather,
     foreign,
     fst,
+    lfe,
     readxl
