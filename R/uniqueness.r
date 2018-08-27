@@ -17,12 +17,12 @@ is_id <- function(df, ..., notifier = base::warning) {
 
 #' @export
 is_id.data.frame <- function(df, ..., notifier = base::warning) {
-  claimed_id_vars <- tidyselect::vars_select(names(df), ...)
+  claimed_id_vars <- tidyselect::vars_select(colnames(df), ...)
 
   stopifnot(is.character(claimed_id_vars), length(claimed_id_vars) > 0,
             is.function(notifier))
 
-  not_found_vars <- base::setdiff(claimed_id_vars, names(df))
+  not_found_vars <- base::setdiff(claimed_id_vars, colnames(df))
   if (length(not_found_vars) > 0) {
     err_msg <- sprintf("Claimed ID vars not in dataset: %s",
                        paste(not_found_vars, collapse = ", "))
@@ -34,7 +34,7 @@ is_id.data.frame <- function(df, ..., notifier = base::warning) {
   id_cols_with_na <- purrr::map_lgl(df_id_cols_only, anyNA)
   if (any(id_cols_with_na)) {
     err_msg <- paste("ID variables cannot be NA. Problem variables:",
-      paste(names(id_cols_with_na)[id_cols_with_na], collapse = ", "), sep = "\n")
+      paste(colnames(id_cols_with_na)[id_cols_with_na], collapse = ", "), sep = "\n")
     notifier(err_msg)
     return(FALSE)
   }
@@ -52,7 +52,7 @@ is_id.data.frame <- function(df, ..., notifier = base::warning) {
 #' @export
 is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
   `.` <- NULL # make R CMD CHECK happy.
-  df_names <- force_names(df)
+  df_names <- colnames(df)
   claimed_id_vars <- tidyselect::vars_select(df_names, ...)
 
   stopifnot(is.character(claimed_id_vars), length(claimed_id_vars) > 0,
@@ -98,7 +98,7 @@ is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
 #' @export
 ensure_id_vars <- function(df, ...) {
   if (! isTRUE(is_id(df, ..., notifier = base::stop))) {
-    claimed_id_vars <- tidyselect::vars_select(names(df), ...)
+    claimed_id_vars <- tidyselect::vars_select(colnames(df), ...)
     stop("Variables don't uniquely identify rows: ",
          paste(claimed_id_vars, collapse = ", "))
   }

@@ -1,28 +1,4 @@
 
-
-#' Really get the names of the object
-#'
-#' @param x Object to get names of
-#' @return names of x, or NULL if x has no names
-#' @seealso [names()]
-#'
-#' Works even for dplyr's lazy tables.
-#' @export
-force_names <- function(x) {
-  UseMethod("force_names")
-}
-
-#' @export
-force_names.default <- function(x) {
-  names(x)
-}
-
-#' @export
-force_names.tbl_lazy <- function(x) {
-  x_header <- dplyr::collect(utils::head(x, 0))
-  names(x_header)
-}
-
 #' Really get the number of rows of the table
 #'
 #' @param .tbl Table to count rows of
@@ -84,8 +60,8 @@ make_join_safer <- function(join_fn, fast = TRUE) {
       names_x_by <- names(by)
       names_y_by <- unname(by)
     }
-    names_x_notby <- base::setdiff(force_names(x), names_x_by)
-    names_y_notby <- base::setdiff(force_names(y), names_y_by)
+    names_x_notby <- base::setdiff(colnames(x), names_x_by)
+    names_y_notby <- base::setdiff(colnames(y), names_y_by)
     clashing_names <- base::intersect(names_x_notby, names_y_notby)
     if (length(clashing_names) > 0) {
       stop("Overlapping names are not allowed. (Rerun with allow_name_clash = ",
@@ -206,7 +182,7 @@ merge_stata <- function(x, y, multi = c("1:1", "1:m", "m:1", "1:1 _n"),
 
   select_keepusing <- function(y, by, keepusing) {
     if (! is.null(keepusing)) {
-      keepusing <- tidyselect::vars_select(names(y), keepusing)
+      keepusing <- tidyselect::vars_select(colnames(y), keepusing)
       by_to_add <- setdiff(by, keepusing)
       keepusing <- c(keepusing, by_to_add)
       y <- dplyr::select(y, keepusing)

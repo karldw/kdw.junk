@@ -1,13 +1,13 @@
 Package: kdw.junk
 Title: Miscellaneous Functions Karl Found Useful
-Version: 0.0.7
+Version: 0.0.8
 Authors@R: person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("aut", "cre"))
 Description: A variety of functions, mostly interacting with the tidyverse.
 Depends: R (>= 3.3.0)
 License: Mozilla Public License 2.0
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Roxygen: list(markdown = TRUE)
 Imports:
     dplyr,
