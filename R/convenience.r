@@ -376,3 +376,39 @@ felm_strict <- function(formula, data, ..., dates_as_factor = TRUE, strict = TRU
   }
   return(lfe::felm(formula = formula, data = model_data, ...))
 }
+
+
+#' Truncate a string to be no longer than a specific number of bytes
+#'
+#' @param x Vector of strings to truncate
+#' @param max_len Max length (in bytes). Can be one number or have the same lenth as `x`
+#' @return x, truncated to `max_len` bytes each. The function won't chop
+#'   multi-byte characters in half, so the result might be shorter than `max_len`
+#' @note Requires package `stringi`. This implementation is really inefficient.
+#' @seealso [stringi::stri_sub()] and [base::substr()]
+#' @examples
+#' truncate_bytes(c("ab", "cde"), c(1, 2))
+#' latin1_str <- "fa\xE7ile"
+#' Encoding(latin1_str) <- "latin1"
+#' truncate_bytes("latin1_str, 3)
+#' truncate_bytes("ὯaὯa", 2) # empty string
+#' truncate_bytes("ὯaὯa", 6) # Ὧa only
+#' @export
+truncate_bytes <- function(x, max_len = Inf) {
+  stopifnot(length(max_len) == 1L || length(max_len) == length(x), !anyNA(max_len), all(max_len >= 0), !anyNA(x))
+  if (all(stringi::stri_numbytes(x) < max_len)) {
+    return(x)
+  }
+  if (all(stringi::stri_numbytes(x) == stringi::stri_length(x))) {
+    # Special-case for anything that fits in one byte (ascii+)
+    return(stringi::stri_sub(x, length = max_len))
+  }
+  truncate_the_hard_way <- function(one_x, one_max_len) {
+    while(stringi::stri_numbytes(one_x) > one_max_len) {
+      one_x <- stringi::stri_sub(one_x, from = 1L, length = stringi::stri_length(one_x) - 1L)
+    }
+    one_x
+  }
+  out <- purrr::map2_chr(x, max_len, truncate_the_hard_way)
+  return(out)
+}
