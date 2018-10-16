@@ -44,32 +44,39 @@ pg_add_index <- function(con, table_name, indexed_col, unique_index = FALSE,
   # Obviously don't expose it to anyone malicious.
 
   stopifnot(length(table_name) == 1, length(indexed_col) >= 1)
-  # Doesn't work with temp tables.  Instead, just reply on SQL to complain.
+  # Doesn't work with temp tables.  Instead, just rely on SQL to complain.
   # .pg_assert_existence(con, table_name, indexed_col)
   indexed_col_names <- gsub(".", "_", make.names(indexed_col), fixed = TRUE)
   index_name <- paste0(paste(indexed_col_names, collapse = "_"), "_index")
-  index_name <- DBI::dbQuoteIdentifier(con, gsub("_+", "_", index_name, perl = TRUE))
+  index_name <- gsub("_+", "_", index_name, perl = TRUE)
+  # TODO: This isn't exactly right, because substr selects characters, not bytes
+  index_name <- substr(index_name, 1, 63)
 
   if (unique_index) {
-    unique_cmd <- "UNIQUE"
+    # fillfactor to 100 because I'm never adding rows
+    statement <- "CREATE UNIQUE INDEX ?index_name on ?table_name (?index_spec) WITH (fillfactor = 100)"
   } else {
-    unique_cmd <- ""
+    statement <- "CREATE INDEX ?index_name on ?table_name (?index_spec) WITH (fillfactor = 100)"
   }
   if (drop_existing) {
-    drop_cmd <- sprintf("DROP INDEX IF EXISTS %s", index_name)
-    DBI::dbSendStatement(con, drop_cmd)
+    drop_cmd <- DBI::sqlInterpolate(con, "DROP INDEX IF EXISTS ?index_name",
+      index_name = DBI::dbQuoteIdentifier(con, index_name))
+    drop_res <- DBI::dbSendStatement(con, drop_cmd)
+    DBI::dbClearResult(drop_res)
   }
-  # If there are multiple columns, make a comma-separated list
-  indexed_col_str <- paste(indexed_col, collapse = ", ")
-  # fillfactor to 100 because I'm never adding rows to this table
-  # TODO: It would be better to use dbBind than this sprintf nonsense
-  add_cmd <- sprintf("CREATE %s INDEX %s on %s (%s) WITH (fillfactor = 100)",
-                     unique_cmd,
-                     index_name,
-                     DBI::dbQuoteIdentifier(table_name),
-                     DBI::dbQuoteLiteral(indexed_col_str))
-  res <- DBI::dbSendStatement(con, add_cmd)
-  stopifnot(DBI::dbHasCompleted(res))
+  # If there are multiple columns, make a comma-separated list. Quote each name,
+  # then paste them together with commas, then mark them as not needing
+  # additional quoting. There must be a better way to do this.
+  indexed_col <- purrr::map_chr(indexed_col, DBI::dbQuoteIdentifier, conn = con)
+  index_spec <- DBI::SQL(paste(indexed_col, collapse = ", "))
+  # Note that prepared statements can't be used here because postgres doesn't
+  # spport them for CREATE statements.
+  filled_statement <- DBI::sqlInterpolate(con, statement,
+    table_name = DBI::dbQuoteIdentifier(con, table_name),
+    index_spec = DBI::dbQuoteIdentifier(con, index_spec),
+    index_name = DBI::dbQuoteIdentifier(con, index_name))
+  res <- DBI::dbSendStatement(con, filled_statement)
+  DBI::dbClearResult(res)
   return(index_name)
 }
 
@@ -81,6 +88,7 @@ pg_add_index <- function(con, table_name, indexed_col, unique_index = FALSE,
 #' @param col_name Column names to check. Default doesn't check any.
 #' @return Nothing
 .pg_assert_existence <- function(con, table_name, col_name = NULL) {
+  # TODO: can I make this work for temporary tables?
   if (! DBI::dbExistsTable(con, table_name)) {
     err_msg <- sprintf("Table name '%s' is not in the database", table_name)
     stop(err_msg)
@@ -119,11 +127,11 @@ pg_vacuum <- function(con, table_name = NULL, analyze = TRUE) {
     stopifnot(length(table_name) == 1)
     # default w/o table name is all tables in database
     .pg_assert_existence(con, table_name)
-    sql_cmd <- paste(sql_cmd, DBI::dbQuoteIdentifier(table_name))
+    sql_cmd <- paste(sql_cmd, DBI::dbQuoteIdentifier(con, table_name))
   }
   # TODO: It would be better to use dbBind than this paste nonsense
   res <- DBI::dbSendStatement(con, sql_cmd)
-  stopifnot(DBI::dbHasCompleted(res))
+  DBI::dbClearResult(res)
 }
 
 
@@ -138,12 +146,13 @@ pg_vacuum <- function(con, table_name = NULL, analyze = TRUE) {
 pg_add_primary_key <- function(con, table_name, key_col) {
   stopifnot(length(table_name) == 1, length(key_col) >= 1)
   existing_index <- pg_add_index(con, table_name, key_col, unique_index = TRUE)
-  # TODO: It would be better to use dbBind than this sprintf nonsense
-  sql_cmd <- sprintf("ALTER TABLE %s ADD PRIMARY KEY USING INDEX %s",
-                     DBI::dbQuoteIdentifier(table_name),
-                     DBI::dbQuoteIdentifier(existing_index))
+  sql_cmd <- DBI::sqlInterpolate(con,
+    "ALTER TABLE ?table_name ADD PRIMARY KEY USING INDEX ?index_name",
+    table_name = DBI::dbQuoteIdentifier(con, table_name),
+    index_name = DBI::dbQuoteIdentifier(con, existing_index))
   res <- DBI::dbSendStatement(con, sql_cmd)
-  stopifnot(DBI::dbHasCompleted(res))
+  DBI::dbClearResult(res)
+  invisible()
 }
 
 
@@ -160,12 +169,13 @@ pg_add_primary_key <- function(con, table_name, key_col) {
 pg_add_foreign_key <- function(con, table_name, column_name, reftable, refcolumn) {
   .pg_assert_existence(con, table_name, column_name)
   .pg_assert_existence(con, reftable, refcolumn)
-  # TODO: It would be better to use dbBind than this sprintf nonsense
-  sql_cmd <- sprintf("ALTER TABLE %s ADD FOREIGN KEY (%s) REFERENCES %s (%s)",
-                     DBI::dbQuoteIdentifier(table_name),
-                     DBI::dbQuoteIdentifier(column_name),
-                     DBI::dbQuoteIdentifier(reftable),
-                     DBI::dbQuoteIdentifier(refcolumn))
+  sql_cmd <- DBI::sqlInterpolate(con,
+    "ALTER TABLE ?table_name ADD FOREIGN KEY (?column_name) REFERENCES ?reftable (?refcolumn)",
+    table_name  = DBI::dbQuoteIdentifier(con, table_name),
+    column_name = DBI::dbQuoteIdentifier(con, column_name),
+    reftable    = DBI::dbQuoteIdentifier(con, reftable),
+    refcolumn   = DBI::dbQuoteIdentifier(con, refcolumn))
   res <- DBI::dbSendStatement(con, sql_cmd)
-  stopifnot(DBI::dbHasCompleted(res))
+  DBI::dbClearResult(res)
+  invisible()
 }
