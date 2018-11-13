@@ -412,3 +412,49 @@ truncate_bytes <- function(x, max_len = Inf) {
   out <- purrr::map2_chr(x, max_len, truncate_the_hard_way)
   return(out)
 }
+
+#' Set some tikzDevice options
+#'
+#' @param font Name of a font, passed to `\\setmainfont`
+#' @param cache_dir Directory to store `tikzDevice_cache` file
+#' @return Nothing
+#' @export
+configure_tikzDevice <- function(font = "Libertinus Serif", cache_dir = "~/.R") {
+
+  # Note that this requireNamespace calls tikzDevice:::.onLoad, which looks for
+  # a working version of latex/lualatex/xelatex. If it's in a non-standard place,
+  # you can provide it as an environment variable or an option. For convenience,
+  # the arguments of this function are also passed to options().
+  has_tikz_device <- requireNamespace("tikzDevice", quietly = TRUE)
+  if (!has_tikz_device) {
+    warning("Package tikzDevice not installed. You need to install it before ",
+            "you can use tikzDevice.")
+    return()
+  }
+  if (utils::packageVersion("tikzDevice") <= "0.12") {
+    warning("tikzDevice is installed, but will not work well with ggplot2.\n",
+            "Please call:\n  devtools::install_github('daqana/tikzDevice')")
+    return()
+  }
+  if (dir.exists(cache_dir)) {
+    options(tikzMetricsDictionary = file.path(cache_dir, "tikzDevice_cache"))
+  } else {
+    message("Cache directory '", cache_dir, "' doesn't exist. Not creating cache file.")
+  }
+  options(
+    tikzDefaultEngine = "luatex",
+    tikzLualatexPackages = c(
+      "\\usepackage{tikz}\n",
+      # "\\IfFileExists{luatex85.sty}{\\usepackage{luatex85}}{}\n",
+      "\\usepackage[active,tightpage,psfixbb]{preview}\n",
+      "\\usepackage{fontspec}\n",
+      "\\PreviewEnvironment{pgfpicture}\n",
+      "\\setlength\\PreviewBorder{0pt}\n",
+      "\\usepackage{microtype}",
+      paste0("\\setmainfont{", font, "}\n")
+    ),
+    tikzUnicodeMetricPackages = c(
+      "\\usetikzlibrary{calc}\n"
+    )
+  )
+}
