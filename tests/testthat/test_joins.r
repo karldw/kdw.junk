@@ -32,11 +32,13 @@ set_up_db <- function() {
   con
 }
 
-test_that("force_nrow works", {
+test_that("nrow(x, force = TRUE) works", {
   skip_if_not_installed("RSQLite")
   con <- set_up_db()
   on.exit(DBI::dbDisconnect(con), add = TRUE)
   mtcars_db <- dplyr::tbl(con, "mtcars")
-  expect_equal(nrow(mtcars), force_nrow(mtcars))
-  expect_equal(nrow(mtcars), force_nrow(mtcars_db))
+  expect_equal(base::nrow(mtcars), nrow(mtcars))
+  expect_equal(base::nrow(mtcars), nrow(mtcars, force = TRUE))
+  expect_equal(NA_real_, nrow(mtcars_db, force = FALSE))
+  expect_equal(base::nrow(mtcars), nrow(mtcars_db, force = TRUE))
 })

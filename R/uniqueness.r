@@ -68,7 +68,7 @@ is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
   any_vars <- dplyr::any_vars  # does nothing except satisfy R CMD CHECK
   df_id_cols_only <- dplyr::ungroup(dplyr::select(df, claimed_id_vars))
   df_nas <- dplyr::filter_all(df_id_cols_only, any_vars(is.na(.)))
-  df_nas_nrow <- force_nrow(utils::head(df_nas, 1))
+  df_nas_nrow <- nrow(utils::head(df_nas, 1), force = TRUE)
   # If the df_nas table has any rows, at least one ID variable contains NAs
   if (df_nas_nrow > 0) {
     # TODO: it would be nice to say which variables contain NA
@@ -76,12 +76,12 @@ is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
     return(FALSE)
   }
 
-  total_row_count <- force_nrow(df_id_cols_only)
+  total_row_count <- nrow(df_id_cols_only, force = TRUE)
   if (total_row_count == 0) {
     notifier("No rows!")
     return(FALSE)
   }
-  nrow_distinct <- force_nrow(dplyr::distinct(df_id_cols_only))
+  nrow_distinct <- nrow(dplyr::distinct(df_id_cols_only), force = TRUE)
 
   nrow_distinct == total_row_count
 }

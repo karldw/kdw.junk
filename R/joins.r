@@ -1,24 +1,31 @@
 
 #' Really get the number of rows of the table
 #'
-#' @param .tbl Table to count rows of
+#' @param x Table to count rows of
+#' @param force Force the count of a `tbl_lazy`? (not used otherwise)
 #' @return Number of rows in .tbl
 #' @seealso [nrow()]
 #'
 #' Works even for dplyr's lazy tables.
 #' @export
-force_nrow <- function(.tbl) {
-  UseMethod("force_nrow")
+nrow <- function(x, force = FALSE) {
+  UseMethod("nrow")
 }
 
-force_nrow.default <- function(.tbl) {
-  nrow(.tbl)
+#' @export
+nrow.default <- function(x, force = FALSE) {
+  base::nrow(x)
 }
 
-force_nrow.tbl_lazy <- function(.tbl) {
-  n <- dplyr::n  # doesn't do anything except satisfy R CMD CHECK
-  x_nrow <- dplyr::summarize(dplyr::ungroup(.tbl), n = n())
-  res <- dplyr::collect(x_nrow)$n
+#' @export
+nrow.tbl_lazy <- function(x, force = FALSE) {
+  if (!force) {
+    res <- base::nrow(x)
+  } else {
+    n <- dplyr::n  # doesn't do anything except satisfy R CMD CHECK
+    x_nrow <- dplyr::summarize(dplyr::ungroup(x), n = n())
+    res <- dplyr::collect(x_nrow)$n
+  }
 }
 
 
@@ -95,14 +102,14 @@ make_join_safer <- function(join_fn, fast = TRUE) {
       # for uniqueness in the two datasets.
       # Here, we're just going to count rows and throw an error if the number of
       # results was larger than the join type implies as possible.
-      nrow_x <- force_nrow(x)
+      nrow_x <- nrow(x, force = TRUE)
       if (identical(join_fn, dplyr::inner_join)) {
-        nrow_y <- force_nrow(y)
+        nrow_y <- nrow(y, force = TRUE)
         max_rows <- max(nrow_x, nrow_y)
       } else if (identical(join_fn, dplyr::full_join) ||
                  identical(join_fn, dplyr::left_join) ||
                  identical(join_fn, dplyr::right_join)) {
-        nrow_y <- force_nrow(y)
+        nrow_y <- nrow(y, force = TRUE)
         max_rows <- nrow_x + nrow_y
       } else if (identical(join_fn, dplyr::anti_join)) {
         max_rows <- nrow_x
@@ -111,7 +118,7 @@ make_join_safer <- function(join_fn, fast = TRUE) {
       } else {
         stop("Sorry, I don't know what to do with this join function.")
       }
-      nrow_join_results <- force_nrow(join_results)
+      nrow_join_results <- nrow(join_results, force = TRUE)
       if (nrow_join_results > max_rows) {
         stop(glue::glue(
           "Join results in {joined_rows} rows; more than {max_rows}, the ",
