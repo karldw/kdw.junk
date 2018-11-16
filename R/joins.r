@@ -26,6 +26,7 @@ nrow.tbl_lazy <- function(x, force = FALSE) {
     x_nrow <- dplyr::summarize(dplyr::ungroup(x), n = n())
     res <- dplyr::collect(x_nrow)$n
   }
+  res
 }
 
 
