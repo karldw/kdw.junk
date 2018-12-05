@@ -283,3 +283,59 @@ hol_easter <- function(years){
   names(ans) <- rep("Easter", length(ans))
   ans
 }
+
+
+
+#' US Daylight Saving Time
+#'
+#' Important note: these dates only return values when they were marked
+#' at a federal level. For example, Indiana has done weird things.
+#' "War time"  during World Wars 1 and 2 is not included.
+#'
+#' These functions require the `lubridate` package.
+#'
+#'
+#' @param years Vector of years
+#' @return The date daylight saving started or ended for those years, as a named vector of dates.
+#' @export
+hol_daylight_saving <- function(years) {
+  post2007 <- years >= 2007
+  between_1987_2006 <- years >= 1987 & years <= 2006
+  is1974 <- years == 1974
+  is1975 <- years == 1975
+  between_1966_1986 <- years >= 1966 & years <= 1986 & (!years %in% 1974:1975)
+  dst_starts <- structure(numeric(0L), class = "Date")
+  dst_stops  <- structure(numeric(0L), class = "Date")
+  if (any(post2007)) {
+    # 2nd Sunday of March, 1st Sunday of November
+    mar14 <- lubridate::make_date(years[post2007], month=3L,  day=14L)
+    nov7  <- lubridate::make_date(years[post2007], month=11L, day=7L)
+    dst_starts <- c(dst_starts, .round_down_weekday(mar14, "Sun"))
+    dst_stops  <- c(dst_stops,  .round_down_weekday(nov7,  "Sun"))
+  }
+  if (any(between_1987_2006)) {
+    # 1st Sunday April, last Sunday October
+    apr7  <- lubridate::make_date(years[between_1987_2006], month=4L,  day=7L)
+    oct31 <- lubridate::make_date(years[between_1987_2006], month=10L, day=31L)
+    dst_starts <- c(dst_starts, .round_down_weekday(apr7,  "Sun"))
+    dst_stops  <- c(dst_stops,  .round_down_weekday(oct31, "Sun"))
+  }
+  if (any(between_1966_1986)) {
+    # last Sunday April, last Sunday October, except 1974 and 1975
+    apr30 <- lubridate::make_date(years[between_1966_1986], month=4L,  day=30L)
+    oct31 <- lubridate::make_date(years[between_1966_1986], month=10L, day=31L)
+    dst_starts <- c(dst_starts, .round_down_weekday(apr30,  "Sun"))
+    dst_stops  <- c(dst_stops,  .round_down_weekday(oct31,  "Sun"))
+  }
+  if (any(is1974)) {
+    dst_starts <- c(dst_starts, rep(lubridate::make_date(1974L,  1L,  6L), sum(is1974)))
+    dst_stops  <- c(dst_stops,  rep(lubridate::make_date(1974L, 10L, 27L), sum(is1974)))
+  }
+  if (any(is1975)) {
+    dst_starts <- c(dst_starts, rep(lubridate::make_date(1975L,  2L, 23L), sum(is1975)))
+    dst_stops  <- c(dst_stops,  rep(lubridate::make_date(1975L, 10L, 26L), sum(is1975)))
+  }
+  names(dst_starts) <- rep("DSTstart", length(dst_starts))
+  names(dst_stops) <- rep("DSTend", length(dst_stops))
+  c(dst_starts, dst_stops)
+}

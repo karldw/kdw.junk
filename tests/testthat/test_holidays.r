@@ -43,3 +43,11 @@ test_that(".round_down_weekday works", {
   # test the rounding down part
   expect_true(all(thursday_dates <= lots_of_days))
 })
+
+test_that("daylight saving works", {
+  expect_equal(sort(unname(hol_daylight_saving(2018))), as.Date(c("2018-03-11", "2018-11-04")))
+  expect_equal(hol_daylight_saving(1900), structure(numeric(0), class="Date"))
+  expect_equal(sort(unname(hol_daylight_saving(1986:1987))),
+    as.Date(c("1986-04-27", "1986-10-26", "1987-04-05", "1987-10-25")))
+  expect_true(all(names(hol_daylight_saving(1900:2020) %in% c("DSTstart", "DSTend"))))
+})
