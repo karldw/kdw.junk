@@ -458,3 +458,47 @@ configure_tikzDevice <- function(font = "Libertinus Serif", cache_dir = "~/.R") 
     )
   )
 }
+
+
+#' Rename columns in a table
+#'
+#' @param .tbl Table to rename
+#' @param .vars A named character vector, where the names are the new column
+#'   names and the values are existing column names.
+#' @param strict Should the function raise an error if existing column names
+#'   can't be found? (Default TRUE)
+#' @return The same .tbl, with some renamed columns
+#'
+#' Note that this function is the same as `colnames()<-` for in-memory
+#' data.frames, but also works for remote tbls. It's similar to pandas'
+#' `.rename` method.
+#' @export
+rename_cols <- function(.tbl, .vars, strict = TRUE) {
+  tbl_names <- colnames(.tbl)
+  old_names <- unname(.vars)
+  if (! purrr::is_bare_character(.vars) ||
+    length(.vars) == 1 ||
+    length(names(.vars)) != length(.vars)) {
+    stop("Must provide a named character vector of variables to rename. The form should be c(\"new_name\" = \"old_name\")")
+  }
+  if (anyDuplicated(unname(.vars))) {
+    stop("The original names should not be duplicated")
+  }
+  # Get the index in tbl_names that we're going to rename
+  # Will be NA if missing
+  rename_idx <- match(old_names, tbl_names)
+  if (anyNA(rename_idx)) {
+    if (strict) {
+      stop("Variables not present to rename:\n  ", paste(old_names[is.na(rename_idx)], collapse = ", "))
+    }
+    rename_idx <- rename_idx[!is.na(rename_idx)]
+  }
+  .renaming_fn <- function(x) {
+    # new name is stored in the names attribute
+    names(.vars[old_names == x])
+  }
+  out <- dplyr::rename_at(.tbl,
+     .vars = dplyr::vars(rename_idx),
+     .funs = dplyr::funs(.renaming_fn))
+  out
+}
