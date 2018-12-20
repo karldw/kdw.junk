@@ -502,3 +502,30 @@ rename_cols <- function(.tbl, .vars, strict = TRUE) {
      .funs = dplyr::funs(.renaming_fn))
   out
 }
+
+#' Get or set memory limits
+#'
+#' For Linux (or BSD), this function calls [ulimit::memory_limit()]
+#' For Windows, this function calls [utils::memory.limit()]
+#' For Mac OS X, no limiting is available.
+#'
+#' @param size numeric. Request a new limit, in MiB.
+#' @return A vector with the (new) limit, in MiB.
+#' @seealso \link[base]{Memory-limits} for other limits.
+#' @export
+memory_limit <- function(size = NA) {
+  os <- get_os()
+  if (os == "win") {
+    limit <- utils::memory.limit(size)
+  } else if (os == "linux") {
+    if (!requireNamespace("ulimit", quietly=TRUE)) {
+      stop("Limiting memory on Linux requires the ulimit package. To install:\n",
+      "  devtools::install_github(krlmlr/ulimit)")
+    }
+    limit <- ulimit::memory_limit(size)
+  } else {
+    warning("Sorry, memory limits on OS X are not supported")
+    limit <- NULL
+  }
+  limit
+}
