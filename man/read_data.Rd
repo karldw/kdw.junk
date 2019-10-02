@@ -2,7 +2,7 @@
 % Please edit documentation in R/convenience.r
 \name{read_data}
 \alias{read_data}
-\title{Read a dataset into memory, using extension to figure out file type}
+\title{DEPRECATED: Read a dataset into memory, using extension to figure out file type}
 \usage{
 read_data(file, ..., guess_max = 1e+06)
 }
@@ -16,26 +16,7 @@ read_data(file, ..., guess_max = 1e+06)
 }
 \value{
 The read data
-
-This function is useful to read a range of datasets where you want to be able
-to use a single reading function. It's a convenience function, and obviously
-can't read all data types.
-
-Notes on the reading functions:
-\itemize{
-\item xls and xlsx call \code{\link[readxl:read_xls]{readxl::read_xls()}} and \code{\link[readxl:read_xlsx]{readxl::read_xlsx()}}
-\item dbf uses \code{\link[foreign:read.dbf]{foreign::read.dbf()}}, with \code{as.is = TRUE}
-\item fst uses \code{\link[fst:read_fst]{fst::read_fst()}}
-\item feather uses \link[feather:read_feather]{feather::read_feather}
-\item csv uses \code{\link[data.table:fread]{data.table::fread()}} with \code{data.table = FALSE}
-\item dta uses \code{\link[kdw.junk:read_dta]{kdw.junk::read_dta()}}
-\item rds uses \code{\link[=readRDS]{readRDS()}}
-}
-
-The \code{gues_max} parameter is set so high because computers are fast and I've
-had a lot of issues with datasets that have blank cells for several thousand
-rows (which read_excel reads as logical).
 }
 \description{
-Read a dataset into memory, using extension to figure out file type
+DEPRECATED: Read a dataset into memory, using extension to figure out file type
 }

@@ -1,6 +1,6 @@
 Package: kdw.junk
 Title: Miscellaneous Functions Karl Found Useful
-Version: 0.0.12
+Version: 0.0.13
 Authors@R: person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("aut", "cre"))
 Description: A variety of functions, mostly interacting with the tidyverse.
 Depends: R (>= 3.3.0)
@@ -11,25 +11,22 @@ RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Imports:
     dplyr,
-    jsonlite,
+    glue,
     purrr,
-    tidyselect,
     rlang,
-    glue
+    tidyselect,
 Suggests:
-    methods,
-    testthat,
     DBI,
     dbplyr,
-    RSQLite,
-    stringi,
     ggplot2,
     haven,
-    data.table,
-    feather,
-    foreign,
-    fst,
+    igraph,
+    jsonlite,
     lfe,
     lubridate,
+    methods,
+    RSQLite,
+    sf,
+    stringi,
+    testthat,
     tikzDevice (>= 0.12.2),
-    readxl

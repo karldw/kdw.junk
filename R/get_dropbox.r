@@ -6,6 +6,9 @@
 #' @return A vector of the user's dropbox folder(s)
 #' @export
 dropbox_home <- function(dropbox_path_override = Sys.getenv("DROPBOX_PATH")) {
+  if (!requireNamespace("jsonlite", quietly=TRUE)) {
+    stop("dropbox_home requires the jsonlite package")
+  }
   if (dropbox_path_override != "") {
     if (dir.exists(dropbox_path_override)) {
       return(dropbox_path_override)
