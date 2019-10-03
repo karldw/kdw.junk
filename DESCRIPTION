@@ -1,6 +1,6 @@
 Package: kdw.junk
 Title: Miscellaneous Functions Karl Found Useful
-Version: 0.0.13
+Version: 0.0.15
 Authors@R: person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("aut", "cre"))
 Description: A variety of functions, mostly interacting with the tidyverse.
 Depends: R (>= 3.3.0)
@@ -30,3 +30,6 @@ Suggests:
     stringi,
     testthat,
     tikzDevice (>= 0.12.2),
+    ulimit,
+Remotes:
+    github::krlmlr/ulimit,
