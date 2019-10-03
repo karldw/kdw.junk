@@ -287,8 +287,8 @@ narrate <- function(..., verbose = TRUE) {
 #' @param quoted Should the individual elements have quotes around them?
 #' @param add_and Should we add an 'and' before the last element
 #' @return A string (length 1 character vector)
-#' @example
-#' vec2string(c(1,2,3)) == "'1', '2', and '3'"
+#' @examples
+#' vec2string(c(1,2,3))  # "'1', '2', and '3'"
 #' @export
 vec2string <- function(x, quoted = TRUE, add_and = TRUE) {
   # Like the toString function, but better
@@ -325,7 +325,7 @@ vec2string <- function(x, quoted = TRUE, add_and = TRUE) {
 #' @param dates_as_factor Should dates be converted to factors before running felm? (Default true)
 #' @param strict Should felm's warnings be treated as errors? Default true.
 #' @return The result from `felm()`
-#' @example
+#' @examples
 #' felm_strict(cyl ~ wt, mtcars)
 #' @export
 felm_strict <- function(formula, data, ..., dates_as_factor = TRUE, strict = TRUE) {
@@ -337,7 +337,7 @@ felm_strict <- function(formula, data, ..., dates_as_factor = TRUE, strict = TRU
     options(warn = 2)
   }
   is_date <- function(x) {
-    methods::is(x, "Date")
+    inherits(x, "Date")
   }
   model_data <- stats::model.frame(formula, data)
   if (dates_as_factor) {
@@ -360,7 +360,7 @@ felm_strict <- function(formula, data, ..., dates_as_factor = TRUE, strict = TRU
 #' truncate_bytes(c("ab", "cde"), c(1, 2))
 #' latin1_str <- "fa\xE7ile"
 #' Encoding(latin1_str) <- "latin1"
-#' truncate_bytes("latin1_str, 3)
+#' truncate_bytes(latin1_str, 3)
 #' truncate_bytes("ὯaὯa", 2) # empty string
 #' truncate_bytes("ὯaὯa", 6) # Ὧa only
 #' @export

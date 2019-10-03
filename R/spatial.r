@@ -1,8 +1,8 @@
 
-#' # Union intersecting geometries in x
+#' Union intersecting geometries in x
 #
 #' @param x An simple features object (`sf`, `sfg`, or `sfg`)
-#' @returns The union of intersecting geometries
+#' @return The union of intersecting geometries
 #' Specifically, union all of the intersecting groups in x
 #' https://gis.stackexchange.com/a/323067
 #' @examples
@@ -14,6 +14,8 @@
 #' x = st_sf(box = 1:6, st_sfc(sq(c(4.2,4.2)), sq(c(0,0)), sq(c(1, -0.8)),
 #'   sq(c(0.5, 1.7)), sq(c(3,3)), sq(c(-3, -3))))
 #' st_union_intersection(x)
+#' @seealso [sf::st_union()]
+#' @importFrom purrr "%>%"
 #' @export
 st_union_intersection <- function(x) {
   if (!requireNamespace("igraph", quietly=TRUE)) {
@@ -21,9 +23,6 @@ st_union_intersection <- function(x) {
   }
   if (!requireNamespace("sf", quietly=TRUE)) {
     stop("st_union_intersection requires the sf package")
-  }
-  if (!methods::existsFunction("%>%")) {
-    `%>%` <- sf::`%>%`
   }
   if (length(x) == 0) {
     return(x)

@@ -23,3 +23,6 @@ The result from \code{felm()}
 \description{
 Make felm slightly easier to use for someone who forgets to check things
 }
+\examples{
+felm_strict(cyl ~ wt, mtcars)
+}

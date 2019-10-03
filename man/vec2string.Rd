@@ -19,3 +19,6 @@ A string (length 1 character vector)
 \description{
 Turn a vector into one long string, used to generate messages
 }
+\examples{
+vec2string(c(1,2,3))  # "'1', '2', and '3'"
+}

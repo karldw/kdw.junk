@@ -21,6 +21,14 @@ Truncate a string to be no longer than a specific number of bytes
 \note{
 Requires package \code{stringi}. This implementation is really inefficient.
 }
+\examples{
+truncate_bytes(c("ab", "cde"), c(1, 2))
+latin1_str <- "fa\\xE7ile"
+Encoding(latin1_str) <- "latin1"
+truncate_bytes(latin1_str, 3)
+truncate_bytes("ὯaὯa", 2) # empty string
+truncate_bytes("ὯaὯa", 6) # Ὧa only
+}
 \seealso{
 \code{\link[stringi:stri_sub]{stringi::stri_sub()}} and \code{\link[base:substr]{base::substr()}}
 }

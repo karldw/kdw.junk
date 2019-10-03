@@ -1,6 +1,6 @@
 Package: kdw.junk
 Title: Miscellaneous Functions Karl Found Useful
-Version: 0.0.15
+Version: 0.0.16
 Authors@R: person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("aut", "cre"))
 Description: A variety of functions, mostly interacting with the tidyverse.
 Depends: R (>= 3.3.0)
@@ -24,7 +24,6 @@ Suggests:
     jsonlite,
     lfe,
     lubridate,
-    methods,
     RSQLite,
     sf,
     stringi,

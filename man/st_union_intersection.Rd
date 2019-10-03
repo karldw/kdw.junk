@@ -9,6 +9,11 @@ st_union_intersection(x)
 \arguments{
 \item{x}{An simple features object (\code{sf}, \code{sfg}, or \code{sfg})}
 }
+\value{
+The union of intersecting geometries
+Specifically, union all of the intersecting groups in x
+https://gis.stackexchange.com/a/323067
+}
 \description{
 Union intersecting geometries in x
 }
@@ -21,4 +26,7 @@ sq = function(pt, sz = 1) {
 x = st_sf(box = 1:6, st_sfc(sq(c(4.2,4.2)), sq(c(0,0)), sq(c(1, -0.8)),
   sq(c(0.5, 1.7)), sq(c(3,3)), sq(c(-3, -3))))
 st_union_intersection(x)
+}
+\seealso{
+\code{\link[sf:st_union]{sf::st_union()}}
 }
