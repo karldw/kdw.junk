@@ -499,3 +499,33 @@ memory_limit <- function(size = NA) {
   }
   limit
 }
+
+#' Make names nicer to work with
+#'
+#' @param x A character vector of names
+#' @return A transformed version of those names
+#' @seealso [make.names()] and [tibble::tibble()]'s `.name_repair` argument
+#'
+#' Resulting names are guaranteed to be unique, and will almost certainly be
+#' syntactic.
+#'
+#' @examples
+#' make_better_names(c("Country", "GDP $M", "Coast.Length"))
+#' #> [1] "country" "gdp_mn"  "coast_length"
+#' @export
+make_better_names <- function(x) {
+  `.` <- NULL # make R CMD CHECK happy
+  better_names <- gsub("%", "pct", x, fixed=TRUE) %>%
+    gsub("$M", "mn", ., fixed=TRUE) %>%
+    gsub("$B", "bn", ., fixed=TRUE) %>%
+    gsub("$T", "tn", ., fixed=TRUE) %>%
+    make.names() %>%
+    tolower() %>%
+    gsub(".", "_", ., fixed=TRUE) %>%
+    gsub("_+", "_", ., perl=TRUE) %>%
+    gsub("^_|_$", "", ., perl=TRUE) %>%
+    make.names(unique=TRUE) %>%
+    gsub(".", "_", ., fixed=TRUE)
+  stopifnot(anyDuplicated(better_names) == 0)
+  better_names
+}
