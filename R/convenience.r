@@ -442,12 +442,16 @@ configure_tikzDevice <- function(font = "Libertinus Serif", cache_dir = "~/.R") 
 #' Note that this function is the same as `colnames()<-` for in-memory
 #' data.frames, but also works for remote tbls. It's similar to pandas'
 #' `.rename` method.
+#'
+#' @examples
+#' cols_to_rename <- c(cyl2 = "cyl")
+#' rename_cols(mtcars, cols_to_rename)
 #' @export
 rename_cols <- function(.tbl, .vars, strict = TRUE) {
   tbl_names <- colnames(.tbl)
   old_names <- unname(.vars)
-  if (! purrr::is_bare_character(.vars) ||
-    length(.vars) == 1 ||
+  if ((! purrr::is_bare_character(.vars)) ||
+    (length(.vars) == 0) ||
     length(names(.vars)) != length(.vars)) {
     stop("Must provide a named character vector of variables to rename. The form should be c(\"new_name\" = \"old_name\")")
   }
@@ -469,7 +473,7 @@ rename_cols <- function(.tbl, .vars, strict = TRUE) {
   }
   out <- dplyr::rename_at(.tbl,
      .vars = dplyr::vars(rename_idx),
-     .funs = dplyr::funs(.renaming_fn))
+     .funs = list(.renaming_fn))
   out
 }
 

@@ -39,3 +39,16 @@ test_that("make_better_names works for a small example", {
   res <- make_better_names(c("Country", "GDP $M", "Coast.Length"))
   expect_equal(res, c("country", "gdp_mn", "coast_length"))
 })
+
+test_that("rename_cols works for single-col renames", {
+  res <- rename_cols(mtcars, c("cyl2" = "cyl"))
+  expected <- dplyr::rename(mtcars, cyl2 = cyl)
+  expect_equal(expected, res)
+})
+
+test_that("rename_cols works for multi-col renames", {
+  res <- rename_cols(mtcars, c("cyl2" = "cyl", "mpg2" = "mpg"))
+  expected <- dplyr::rename(mtcars, cyl2 = cyl, mpg2 = mpg)
+  expect_equal(expected, res)
+})
+# TODO: should test renaming remote tables. 

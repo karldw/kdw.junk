@@ -25,3 +25,7 @@ data.frames, but also works for remote tbls. It's similar to pandas'
 \description{
 Rename columns in a table
 }
+\examples{
+cols_to_rename <- c(cyl2 = "cyl")
+rename_cols(mtcars, cols_to_rename)
+}
