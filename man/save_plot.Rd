@@ -4,7 +4,7 @@
 \alias{save_plot}
 \title{Save a ggplot plot}
 \usage{
-save_plot(plt, filename, scale_mult = 1, bg = "white")
+save_plot(plt, filename, scale_mult = 1, bg = "transparent")
 }
 \arguments{
 \item{plt}{The plot created by \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}}
@@ -15,9 +15,10 @@ save_plot(plt, filename, scale_mult = 1, bg = "white")
 numbers use a larger canvas.}
 
 \item{bg}{The background color, passed to the cairo_pdf device. The default
-is "white". If set to "transparent", the plot will be modified to make the
-\code{panel.background}, \code{plot.background}, \code{legend.background}, and
-\code{legend.box.background} transparent as well.}
+is "transparent". If set to "transparent", the plot will be modified to make
+the \code{panel.background}, \code{plot.background}, \code{legend.background}, and
+\code{legend.box.background} transparent as well. Set it to "white" to retain
+the normal ggplot behavior.}
 }
 \value{
 The plot (invisibly)

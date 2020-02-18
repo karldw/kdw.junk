@@ -185,13 +185,15 @@ is.connection <- function(x) {
 #' @param scale_mult A scale multiplier on the size. Defaults to 1; bigger
 #' numbers use a larger canvas.
 #' @param bg The background color, passed to the cairo_pdf device. The default
-#' is "white". If set to "transparent", the plot will be modified to make the
-#' `panel.background`, `plot.background`, `legend.background`, and
-#' `legend.box.background` transparent as well.
+#' is "transparent". If set to "transparent", the plot will be modified to make
+#' the `panel.background`, `plot.background`, `legend.background`, and
+#' `legend.box.background` transparent as well. Set it to "white" to retain
+#' the normal ggplot behavior.
 #' @return The plot (invisibly)
 #' @seealso [ggplot2::ggsave()]
 #' @export
-save_plot <- function(plt, filename, scale_mult = 1, bg = "white") {
+save_plot <- function(plt, filename, scale_mult = 1, bg = "transparent") {
+  force(plt)
   stopifnot(dir.exists(dirname(filename)))
   if (identical(bg, "transparent")) {
     plt <- plt + ggplot2::theme(
@@ -209,7 +211,6 @@ save_plot <- function(plt, filename, scale_mult = 1, bg = "white") {
     device = grDevices::cairo_pdf, bg = bg)
   invisible(plt)
 }
-
 
 
 #' Read and reconstitute Stata file.
