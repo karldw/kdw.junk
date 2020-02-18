@@ -4,8 +4,15 @@
 \alias{merge_stata}
 \title{Use dplyr to emulate Stata merges.}
 \usage{
-merge_stata(x, y, multi = c("1:1", "1:m", "m:1", "1:1 _n"), by = NULL,
-  keep = "inner", keepusing = NULL, ...)
+merge_stata(
+  x,
+  y,
+  multi = c("1:1", "1:m", "m:1", "1:1 _n"),
+  by = NULL,
+  keep = "inner",
+  keepusing = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A dataframe to merge ('master' in Stata)}

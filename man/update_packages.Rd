@@ -4,8 +4,7 @@
 \alias{update_packages}
 \title{Update installed packages}
 \usage{
-update_packages(repos = getOption("repos"), checkBuilt = TRUE,
-  verbose = TRUE)
+update_packages(repos = getOption("repos"), checkBuilt = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{repos}{CRAN repo to use (defaults to Rstudio's)}

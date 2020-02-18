@@ -23,7 +23,7 @@ Requires package \code{stringi}. This implementation is really inefficient.
 }
 \examples{
 truncate_bytes(c("ab", "cde"), c(1, 2))
-latin1_str <- "fa\\xE7ile"
+latin1_str <- "fa\xE7ile"
 Encoding(latin1_str) <- "latin1"
 truncate_bytes(latin1_str, 3)
 truncate_bytes("ὯaὯa", 2) # empty string

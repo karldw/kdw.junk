@@ -7,7 +7,7 @@
 configure_tikzDevice(font = "Libertinus Serif", cache_dir = "~/.R")
 }
 \arguments{
-\item{font}{Name of a font, passed to \code{\\setmainfont}}
+\item{font}{Name of a font, passed to \verb{\\\\setmainfont}}
 
 \item{cache_dir}{Directory to store \code{tikzDevice_cache} file}
 }

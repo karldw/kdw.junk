@@ -4,9 +4,17 @@
 \alias{mclapply_socket}
 \title{Define a sockets version of mclapply}
 \usage{
-mclapply_socket(X, FUN, ..., mc.preschedule = TRUE, mc.set.seed = TRUE,
-  mc.silent = FALSE, mc.cores = 1L, mc.cleanup = TRUE,
-  mc.allow.recursive = TRUE)
+mclapply_socket(
+  X,
+  FUN,
+  ...,
+  mc.preschedule = TRUE,
+  mc.set.seed = TRUE,
+  mc.silent = FALSE,
+  mc.cores = 1L,
+  mc.cleanup = TRUE,
+  mc.allow.recursive = TRUE
+)
 }
 \arguments{
 \item{X}{A vector/list to iterate over}

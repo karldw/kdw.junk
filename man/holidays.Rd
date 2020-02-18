@@ -71,7 +71,7 @@ day.
 \item \code{hol_george_washington_birthday()}: George Washington's birthday
 \item \code{hol_presidents_day()}: Presidents day; same as \code{hol_george_washington_birthday()}
 \item \code{hol_good_friday()}: Good Friday (not a federal holiday, but some markets are closed)
-\item \code{hol_easter():} Easter (not a federal holiday)
+\item \verb{hol_easter():} Easter (not a federal holiday)
 \item \code{hol_memorial_day()}: Memorial day
 \item \code{hol_independence_day()}: Independence day (Fourth of July)
 \item \code{hol_labor_day()}: Labor day

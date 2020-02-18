@@ -4,8 +4,10 @@
 \alias{find_rcpp_deps}
 \title{Find installed packages that depend on Rcpp}
 \usage{
-find_rcpp_deps(repos = getOption("repos", default =
-  "https://cran.rstudio.com"), verbose = TRUE)
+find_rcpp_deps(
+  repos = getOption("repos", default = "https://cran.rstudio.com"),
+  verbose = TRUE
+)
 }
 \arguments{
 \item{repos}{CRAN repo to use (defaults to Rstudio's)}

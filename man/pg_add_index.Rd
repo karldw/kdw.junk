@@ -4,8 +4,13 @@
 \alias{pg_add_index}
 \title{Create an index}
 \usage{
-pg_add_index(con, table_name, indexed_col, unique_index = FALSE,
-  drop_existing = FALSE)
+pg_add_index(
+  con,
+  table_name,
+  indexed_col,
+  unique_index = FALSE,
+  drop_existing = FALSE
+)
 }
 \arguments{
 \item{con}{A DBI connection to a postgresql database}

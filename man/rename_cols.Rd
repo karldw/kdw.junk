@@ -18,7 +18,7 @@ can't be found? (Default TRUE)}
 \value{
 The same .tbl, with some renamed columns
 
-Note that this function is the same as \code{colnames()<-} for in-memory
+Note that this function is the same as \verb{colnames()<-} for in-memory
 data.frames, but also works for remote tbls. It's similar to pandas'
 \code{.rename} method.
 }
