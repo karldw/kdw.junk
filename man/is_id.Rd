@@ -19,5 +19,6 @@ escalate issues or \link[base:force]{base::force} to not report them.)}
 TRUE/FALSE for ID-ness
 }
 \description{
-Just like Stata's isid.
+Just like Stata's isid. For normal tables, this runs faster if data.table is
+installed.
 }

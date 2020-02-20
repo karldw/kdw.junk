@@ -2,7 +2,8 @@
 
 #' Do the claimed variables identify rows?
 #'
-#' Just like Stata's isid.
+#' Just like Stata's isid. For normal tables, this runs faster if data.table is
+#' installed.
 #'
 #' @param df A dataframe to test
 #' @param ... Variable names, following [dplyr::select] rules
@@ -44,8 +45,19 @@ is_id.data.frame <- function(df, ..., notifier = base::warning) {
     return(FALSE)
   }
 
-  # anyDuplicated is faster than calling "distinct" then counting rows
-  ids_are_unique <- anyDuplicated(df_id_cols_only) == 0
+  # Timing considerations:
+  # - anyDuplicated from data.table is fastest by far
+  # - dplyr::distinct() is good, and faster than `count` when there's one column
+  # - dplyr::count() is good, and can be better than `distinct` when there are
+  #   multiple columns and the data are unique
+  # - base::anyDuplicated is slow
+  # Tests on this data:
+  # df <- purrr::map_dfr(1:10, ~dplyr::mutate(nycflights13::flights, rep_group = .))
+  if (requireNamespace("data.table", quietly=TRUE)) {
+    ids_are_unique <- anyDuplicated(data.table::as.data.table(df_id_cols_only)) == 0
+  } else {
+    ids_are_unique <- nrow(dplyr::distinct(df_id_cols_only)) == total_row_count
+  }
   return(ids_are_unique)
 }
 

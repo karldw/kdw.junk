@@ -1,6 +1,6 @@
 Package: kdw.junk
 Title: Miscellaneous Functions Karl Found Useful
-Version: 0.0.19
+Version: 0.0.20
 Authors@R: person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("aut", "cre"))
 Description: A variety of functions, mostly interacting with the tidyverse.
 Depends: R (>= 3.3.0)
@@ -18,6 +18,7 @@ Imports:
 Suggests:
     DBI,
     dbplyr,
+    data.table,
     ggplot2,
     haven,
     igraph,
