@@ -517,6 +517,12 @@ memory_limit <- function(size = NA) {
 #' @examples
 #' make_better_names(c("Country", "GDP $M", "Coast.Length"))
 #' #> [1] "country" "gdp_mn"  "coast_length"
+#' # Note that the guarantee to make the names unique can lead to some surprises
+#' # for example, "a_and_b" becomes "a_and_b_3" in this case:
+#' make_better_names(c("a and b", "a-and-b", "a.and.b", "a_and_b"))
+#' #> c("a_and_b", "a_and_b_1", "a_and_b_2", "a_and_b_3")
+#' # Here's a way to have a bad time:
+#' make_better_names(c("", "x", "X", "x_1"))
 #' @export
 make_better_names <- function(x) {
   `.` <- NULL # make R CMD CHECK happy
@@ -528,9 +534,31 @@ make_better_names <- function(x) {
     tolower() %>%
     gsub(".", "_", ., fixed=TRUE) %>%
     gsub("_+", "_", ., perl=TRUE) %>%
-    gsub("^_|_$", "", ., perl=TRUE) %>%
-    make.names(unique=TRUE) %>%
-    gsub(".", "_", ., fixed=TRUE)
-  stopifnot(anyDuplicated(better_names) == 0)
+    gsub("^_|_$", "", ., perl=TRUE)
+  loop_count <- 0L
+  while (anyDuplicated(better_names) != 0) {
+    loop_count <- loop_count + 1L
+    if (loop_count > 100L) {
+      stop("Failed to make names unique!")
+    }
+    better_names <- gsub(".", "_", make.names(better_names, unique=TRUE), fixed=TRUE)
+  }
   better_names
+}
+
+#' Coarsen a date to monthly resolution
+#'
+#' @param x A date vector
+#' @return A date vector of the same length, with the day-of-month always 1
+#'
+#' @examples
+#' make_monthly(as.Date(c("2000-01-01", "2000-01-02")))
+#' #> [1] "2000-01-01" "2000-01-01"
+#' @export
+make_monthly <- function(x) {
+  lubridate::make_date(
+    lubridate::year(x),
+    lubridate::month(x),
+    1L
+  )
 }

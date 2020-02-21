@@ -18,6 +18,12 @@ Make names nicer to work with
 \examples{
 make_better_names(c("Country", "GDP $M", "Coast.Length"))
 #> [1] "country" "gdp_mn"  "coast_length"
+# Note that the guarantee to make the names unique can lead to some surprises
+# for example, "a_and_b" becomes "a_and_b_3" in this case:
+make_better_names(c("a and b", "a-and-b", "a.and.b", "a_and_b"))
+#> c("a_and_b", "a_and_b_1", "a_and_b_2", "a_and_b_3")
+# Here's a way to have a bad time:
+make_better_names(c("", "x", "X", "x_1"))
 }
 \seealso{
 \code{\link[=make.names]{make.names()}} and \code{\link[tibble:tibble]{tibble::tibble()}}'s \code{.name_repair} argument
