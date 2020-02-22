@@ -1,15 +1,20 @@
 
 
-#' Cite currently loaded pacakges
+#' Cite currently attached pacakges
 #'
 #' @param outfile Write results to a file. The default, NULL, doesn't write a file.
-#' @param include Extra packages to include, beyond those that have been loaded.
+#' @param include Extra packages to include, beyond those that have been
+#'  attached (ones that you've called `library()` for.)
 #'  The default, "base", includes a citation for R itself.
-#' @return A list of citations
+#' @return A list of citations, invisibly
 #'
 #' Note that some packages provide multiple citations. This function will pick only the
 #' first one they provided.
-cite_everything <- function(outfile = NULL, include = "base") {
+#'
+#' @examples
+#' cite_attached_packages()
+#' @export
+cite_attached_packages <- function(outfile = NULL, include = "base") {
   prev_enc <- getOption("encoding")
   on.exit(options(encoding = prev_enc), add = TRUE)
   options(encoding = "utf8")
@@ -49,6 +54,7 @@ cite_everything <- function(outfile = NULL, include = "base") {
   }
 
   # Don't auto-include RevoUtilsMath (can still be manually included with the include param)
+  # If no packages have been attached, otherPkgs will be NULL, which is fine.
   pkg_names <- setdiff(names(utils::sessionInfo()$otherPkgs), "RevoUtilsMath")
 
   include <- include[! is.na(include)]
@@ -60,5 +66,5 @@ cite_everything <- function(outfile = NULL, include = "base") {
     cites_text <- paste(lapply(cites, paste, collapse = "\n"), collapse = "\n\n")
     writeLines(cites_text, outfile, useBytes = TRUE)
   }
-  return(cites)
+  invisible(cites)
 }
