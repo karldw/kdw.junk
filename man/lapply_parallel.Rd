@@ -2,7 +2,7 @@
 % Please edit documentation in R/parallel.r
 \name{lapply_parallel}
 \alias{lapply_parallel}
-\title{Run lapply on multiple cores with mclapply}
+\title{DEPRECATED: Run lapply on multiple cores with mclapply}
 \usage{
 lapply_parallel(X, FUN, ..., mc.cores = NULL)
 }
@@ -18,9 +18,8 @@ lapply_parallel(X, FUN, ..., mc.cores = NULL)
 \value{
 The result, as if passed to \code{\link[=lapply]{lapply()}}
 
-Like parallel::mclapply, but with easier core detection (see \link{get_cores} and
-mostly works on Windows. See https://github.com/nathanvan/parallelsugar
+This is now just a thin wrapper around furrr::future_map. You shou
 }
 \description{
-Run lapply on multiple cores with mclapply
+DEPRECATED: Run lapply on multiple cores with mclapply
 }

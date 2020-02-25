@@ -17,7 +17,7 @@ get_cores <- function(max_cores = 4L) {
 }
 
 
-#' Run lapply on multiple cores with mclapply
+#' DEPRECATED: Run lapply on multiple cores with mclapply
 #'
 #' @param X Argument to FUN to iterate over
 #' @param FUN Function to apply
@@ -25,36 +25,15 @@ get_cores <- function(max_cores = 4L) {
 #' @param mc.cores Number of cores to use. (Default of NULL tries to guess.)
 #' @return The result, as if passed to [lapply()]
 #'
-#' Like parallel::mclapply, but with easier core detection (see [get_cores] and
-#' mostly works on Windows. See https://github.com/nathanvan/parallelsugar
+#' This is now just a thin wrapper around furrr::future_map. You shou
 #'
 #' @export
 lapply_parallel <- function(X, FUN, ..., mc.cores = NULL) {
-  # First, figure out how many cores to use.
-  if (is.null(mc.cores)) {
-    mc.cores <- get_cores()
-  } else {
-    mc.cores <- as.integer(mc.cores)
-  }
-
-  stopifnot(is.integer(mc.cores), length(mc.cores) == 1L, ! is.na(mc.cores))
-  # mclapply only gives a warning if scheduled cores experience errors.
-  # set warn = 2 so warnings become errors
-
-  if (get_os() == "win") {
-    mclapply <- mclapply_socket  # defined in parallelsugar.r
-  } else {
-    mclapply <- parallel::mclapply
-  }
-
-  orig_warn <- getOption("warn")
-  on.exit(options(warn = orig_warn), add = TRUE)
-  options(warn = 2)
-  mclapply(X = X, FUN = FUN, ..., mc.cores = mc.cores)
+  stop("lapply_parallel() is deprecated. Use the more powerful furrr::future_map() instead.")
 }
 
 
-#' Run lapply then bind_rows, with multicore
+#' DEPRECATED: Run lapply then bind_rows, with multicore
 #'
 #' @param X Argument to FUN to iterate over
 #' @param FUN Function to apply
@@ -67,16 +46,15 @@ lapply_parallel <- function(X, FUN, ..., mc.cores = NULL) {
 #' @importFrom rlang ":="
 #' @export
 lapply_bind_rows <- function(X, FUN, ..., lapply_id = NULL, mc.cores = NULL) {
-  stopifnot(length(X) >= 1)
-  # just like lapply, but bind the results together at the end (plus parallelization)
-  list_results <- lapply_parallel(X = X, FUN = FUN, ..., mc.cores = mc.cores)
-  stopifnot(length(X) == length(list_results))
-  .bind_rows_add_id(list_results, X = X, lapply_id = lapply_id)
+  stop("lapply_bind_rows() is deorecated. Use the more powerful furrr::future_dfr() instead.")
 }
 
 
 .bind_rows_add_id <- function(lst, X, lapply_id = NULL) {
   # Dispatch based on the class of the first element of the list
+  if (!rlang::is_list(lst)) {
+    stop("This function is meant to be called on lists.")
+  }
   UseMethod(".bind_rows_add_id", lst[[1]])
 }
 

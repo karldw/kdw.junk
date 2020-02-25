@@ -2,7 +2,7 @@
 % Please edit documentation in R/parallel.r
 \name{lapply_bind_rows}
 \alias{lapply_bind_rows}
-\title{Run lapply then bind_rows, with multicore}
+\title{DEPRECATED: Run lapply then bind_rows, with multicore}
 \usage{
 lapply_bind_rows(X, FUN, ..., lapply_id = NULL, mc.cores = NULL)
 }
@@ -22,7 +22,7 @@ identify the \code{X} value used.}
 The result, as if passed to \code{\link[=lapply]{lapply()}}
 }
 \description{
-Run lapply then bind_rows, with multicore
+DEPRECATED: Run lapply then bind_rows, with multicore
 }
 \seealso{
 \code{\link[purrr:map_df]{purrr::map_df()}}, \code{\link[dplyr:bind_rows]{dplyr::bind_rows()}}
