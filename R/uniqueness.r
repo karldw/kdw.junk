@@ -11,6 +11,12 @@
 #'  (Defaults to [base::warning]. Other reasonable options might be [base::stop] to
 #'   escalate issues or [base::force] to not report them.)
 #' @return TRUE/FALSE for ID-ness
+#' @examples
+#' is_id(mtcars, cyl)  # FALSE
+#' is_id(Loblolly, Seed) # FALSE
+#' is_id(Loblolly, Seed, age) # TRUE
+#' vars <- c("Seed", "age")
+#' is_id(Loblolly, vars) # TRUE
 #' @export
 is_id <- function(df, ..., notifier = base::warning) {
   UseMethod("is_id")
@@ -18,20 +24,13 @@ is_id <- function(df, ..., notifier = base::warning) {
 
 #' @export
 is_id.data.frame <- function(df, ..., notifier = base::warning) {
-  claimed_id_vars <- tidyselect::vars_select(colnames(df), ...)
+  df_names <- colnames(df)
+  # eval_select checks if columns are missing
+  claimed_id_vars <- df_names[tidyselect::eval_select(rlang::expr(c(...)), df)]
 
   stopifnot(is.character(claimed_id_vars), length(claimed_id_vars) > 0,
             is.function(notifier))
-
-  not_found_vars <- base::setdiff(claimed_id_vars, colnames(df))
-  if (length(not_found_vars) > 0) {
-    err_msg <- sprintf("Claimed ID vars not in dataset: %s",
-                       paste(not_found_vars, collapse = ", "))
-    notifier(err_msg)
-    return(FALSE)
-  }
-
-  df_id_cols_only <- dplyr::ungroup(dplyr::select(df, claimed_id_vars))
+  df_id_cols_only <- dplyr::ungroup(dplyr::select(df, tidyselect::all_of(claimed_id_vars)))
   id_cols_with_na <- purrr::map_lgl(df_id_cols_only, anyNA)
   if (any(id_cols_with_na)) {
     err_msg <- paste("ID variables cannot be NA. Problem variables:",
@@ -66,6 +65,9 @@ is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
   `.` <- NULL # make R CMD CHECK happy.
   df_names <- colnames(df)
   claimed_id_vars <- tidyselect::vars_select(df_names, ...)
+  # Different approach than data.frame because of
+  # https://github.com/r-lib/tidyselect/issues/177
+  # claimed_id_vars <- df_names[tidyselect::eval_select(rlang::expr(c(...)), df)]
 
   stopifnot(is.character(claimed_id_vars), length(claimed_id_vars) > 0,
             is.function(notifier))
@@ -78,7 +80,7 @@ is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
     return(FALSE)
   }
   any_vars <- dplyr::any_vars  # does nothing except satisfy R CMD CHECK
-  df_id_cols_only <- dplyr::ungroup(dplyr::select(df, claimed_id_vars))
+  df_id_cols_only <- dplyr::ungroup(dplyr::select(df, tidyselect::all_of(claimed_id_vars)))
   df_nas <- dplyr::filter_all(df_id_cols_only, any_vars(is.na(.)))
   df_nas_nrow <- nrow(utils::head(df_nas, 1), force = TRUE)
   # If the df_nas table has any rows, at least one ID variable contains NAs

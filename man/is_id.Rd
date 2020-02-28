@@ -22,3 +22,10 @@ TRUE/FALSE for ID-ness
 Just like Stata's isid. For normal tables, this runs faster if data.table is
 installed.
 }
+\examples{
+is_id(mtcars, cyl)  # FALSE
+is_id(Loblolly, Seed) # FALSE
+is_id(Loblolly, Seed, age) # TRUE
+vars <- c("Seed", "age")
+is_id(Loblolly, vars) # TRUE
+}
