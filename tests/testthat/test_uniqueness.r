@@ -54,3 +54,12 @@ test_that("is_id works for memdb", {
   expect_true(is_id(Loblolly, !!vars))
   expect_true(is_id(Loblolly, !!!vars))
 })
+
+test_that("is_id works for sf objects", {
+  skip_if_not_installed("sf")
+  nc <- sf::read_sf(system.file("shape/nc.shp", package="sf"))
+  expect_true(is_id(nc, CNTY_ID))
+  expect_false(is_id(nc, SID74))
+  CNTY_ID <- "SID74"
+  expect_false(is_id(nc, !!CNTY_ID))
+})
