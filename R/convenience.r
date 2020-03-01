@@ -189,10 +189,13 @@ is.connection <- function(x) {
 #' the `panel.background`, `plot.background`, `legend.background`, and
 #' `legend.box.background` transparent as well. Set it to "white" to retain
 #' the normal ggplot behavior.
+#' @param device The device to use. Defaults to [grDevices::cairo_pdf()] if
+#' available (and [grDevices::pdf()] if not). Use "tex" or "tikz" to save with
+#' [tikzDevice::tikz()].
 #' @return The plot (invisibly)
 #' @seealso [ggplot2::ggsave()]
 #' @export
-save_plot <- function(plt, filename, scale_mult = 1, bg = "transparent") {
+save_plot <- function(plt, filename, scale_mult = 1, bg = "transparent", device="pdf") {
   force(plt)
   stopifnot(dir.exists(dirname(filename)))
   if (identical(bg, "transparent")) {
@@ -204,11 +207,24 @@ save_plot <- function(plt, filename, scale_mult = 1, bg = "transparent") {
       legend.box.background = ggplot2::element_rect(fill = "transparent", color = NA)
     )
   }
+  if (identical(device, "pdf") && capabilities("cairo")) {
+    device <- grDevices::cairo_pdf
+  } else if (identical(device, "tex") || identical(device, "tikz")) {
+    # If it hasn't already been run, run configure_tikzDevice().
+    # To supply different arguments to configure_tikzDevice, you need to call it
+    # before calling save_plot().
+    if (is.null(getOption("tikzDefaultEngine"))) {
+      configure_tikzDevice()
+    }
+    device <- tikzDevice::tikz
+  } else {
+    device <- device
+  }
   # Save in the ratio of a beamer slide.
   # This aspect ratio works pretty well for normal latex too
   ggplot2::ggsave(filename = filename, plot = plt,
     width = 6.3 * scale_mult, height = 3.54 * scale_mult, units = "in",
-    device = grDevices::cairo_pdf, bg = bg)
+    device = device, bg = bg)
   invisible(plt)
 }
 

@@ -4,7 +4,7 @@
 \alias{save_plot}
 \title{Save a ggplot plot}
 \usage{
-save_plot(plt, filename, scale_mult = 1, bg = "transparent")
+save_plot(plt, filename, scale_mult = 1, bg = "transparent", device = "pdf")
 }
 \arguments{
 \item{plt}{The plot created by \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}}
@@ -19,6 +19,10 @@ is "transparent". If set to "transparent", the plot will be modified to make
 the \code{panel.background}, \code{plot.background}, \code{legend.background}, and
 \code{legend.box.background} transparent as well. Set it to "white" to retain
 the normal ggplot behavior.}
+
+\item{device}{The device to use. Defaults to \code{\link[grDevices:cairo_pdf]{grDevices::cairo_pdf()}} if
+available (and \code{\link[grDevices:pdf]{grDevices::pdf()}} if not). Use "tex" or "tikz" to save with
+\code{\link[tikzDevice:tikz]{tikzDevice::tikz()}}.}
 }
 \value{
 The plot (invisibly)

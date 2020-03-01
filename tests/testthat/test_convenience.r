@@ -21,3 +21,17 @@ test_that("make_better_names works as expected", {
   improved_names <- c("x", "x_1", "x_2", "x_1_1")
   expect_equal(make_better_names(orig_names), improved_names)
 })
+
+test_that("plotting code runs", {
+  skip_if_not_installed("ggplot2")
+  plt <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+    ggplot2::geom_point()
+  temp_pdf <- tempfile(fileext = ".pdf")
+  save_plot(plt, temp_pdf)
+  expect_true(file.exists(temp_pdf))
+
+  skip_if_not_installed("tikzDevice")
+  temp_tikz <- tempfile(fileext=".tikz")
+  save_plot(plt, temp_tikz, device="tikz")
+  expect_true(file.exists(temp_tikz))
+})
