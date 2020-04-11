@@ -177,6 +177,79 @@ is.connection <- function(x) {
   inherits(x, "connection")
 }
 
+#' Get a plot device
+#'
+#' @param device A string or function
+#' @param filename A filename (extension will be used if `device` is missing)
+#' @param dpi DPI for output (not relevant for all output)
+#' @return Device function
+#'
+#' @noRd
+plot_dev <- function(device, filename = NULL, dpi = 300) {
+  #' This is like `ggplot2:::plot_dev`, but more opinionated
+  force(filename)
+  force(dpi)
+
+  if (is.function(device)) {
+    if ("file" %in% names(formals(device))) {
+      dev <- function(filename, ...) device(file = filename, ...)
+      return(dev)
+    } else {
+      return(device)
+    }
+  }
+  # Cairo is usually available, but allow fallback to non-cairo.
+  if (capabilities("cairo")) {
+    pdf_fn <- function(filename, ...) {
+      grDevices::cairo_pdf(filename = filename, ..., fallback_resolution = dpi)
+    }
+  } else {
+    # cairo_pdf seems to produce PDF v1.5
+    pdf_fn <- function(filename, ...) {
+      grDevices::pdf(file = filename, ..., version = "1.5")
+    }
+  }
+  ps_fn <- function(...) stop("Don't use postscript.")
+  tikz_fn <- function(...) {
+    # If it hasn't already been run, run configure_tikzDevice().
+    # To supply different arguments to configure_tikzDevice, you need to call it
+    # before calling save_plot().
+    if (is.null(getOption("tikzDefaultEngine"))) {
+      configure_tikzDevice()
+    }
+    tikzDevice::tikz(...)
+  }
+  devices <- list(
+    eps =  ps_fn,
+    ps =   ps_fn,
+    tex =  tikz_fn,
+    tikz =  tikz_fn,
+    pdf =  pdf_fn,
+    svg =  function(filename, ...) svglite::svglite(file = filename, ...),
+    # emf =  grDevices::win.metafile(...),
+    # wmf =  grDevices::win.metafile(...),
+    png =  function(...) grDevices::png(..., res = dpi, units = "in"),
+    jpg =  function(...) grDevices::jpeg(..., res = dpi, units = "in"),
+    jpeg = function(...) grDevices::jpeg(..., res = dpi, units = "in"),
+    # bmp =  function(...) grDevices::bmp(..., res = dpi, units = "in"),
+    tiff = function(...) grDevices::tiff(..., res = dpi, units = "in")
+  )
+
+  if (is.null(device)) {
+    device <- tolower(tools::file_ext(filename))
+  }
+
+  if (!is.character(device) || length(device) != 1) {
+    rlang::abort("`device` must be NULL, a string or a function.")
+  }
+
+  dev <- devices[[device]]
+  if (is.null(dev)) {
+    rlang::abort(glue::glue("Unknown graphics device '{device}'"))
+  }
+  dev
+}
+
 
 #' Save a ggplot plot
 #'
@@ -184,18 +257,27 @@ is.connection <- function(x) {
 #' @param filename The filename to save (save type depends on extension)
 #' @param scale_mult A scale multiplier on the size. Defaults to 1; bigger
 #' numbers use a larger canvas.
-#' @param bg The background color, passed to the cairo_pdf device. The default
+#' @param bg The background color, passed to the output device. The default
 #' is "transparent". If set to "transparent", the plot will be modified to make
 #' the `panel.background`, `plot.background`, `legend.background`, and
 #' `legend.box.background` transparent as well. Set it to "white" to retain
 #' the normal ggplot behavior.
-#' @param device The device to use. Defaults to [grDevices::cairo_pdf()] if
-#' available (and [grDevices::pdf()] if not). Use "tex" or "tikz" to save with
-#' [tikzDevice::tikz()].
+#' @param device The device to use. Default depends on filename extension. Uses
+#' cairo_pdf devices when available. Use "tex" or "tikz" to save with [tikzDevice::tikz()].
 #' @return The plot (invisibly)
 #' @seealso [ggplot2::ggsave()]
+#'
+#' Opinionated device types:
+#'
+#' - `.pdf`: [grDevices::cairo_pdf()]
+#' - `.tex` or `.tikz`: [tikzDevice::tikz()]
+#' - `.svg`: [svglite::svglite()]
+#' - `.png`, `.jpeg`, `.jpg`, `.tiff`: Standard grDevices, but at 300 dpi
+#' - Any thing else: not supported, but you can still pass a function
+#'
+#'
 #' @export
-save_plot <- function(plt, filename, scale_mult = 1, bg = "transparent", device="pdf") {
+save_plot <- function(plt, filename, scale_mult = 1, bg = "transparent", device=NULL) {
   force(plt)
   stopifnot(dir.exists(dirname(filename)))
   if (identical(bg, "transparent")) {
@@ -207,24 +289,15 @@ save_plot <- function(plt, filename, scale_mult = 1, bg = "transparent", device=
       legend.box.background = ggplot2::element_rect(fill = "transparent", color = NA)
     )
   }
-  if (identical(device, "pdf") && capabilities("cairo")) {
-    device <- grDevices::cairo_pdf
-  } else if (identical(device, "tex") || identical(device, "tikz")) {
-    # If it hasn't already been run, run configure_tikzDevice().
-    # To supply different arguments to configure_tikzDevice, you need to call it
-    # before calling save_plot().
-    if (is.null(getOption("tikzDefaultEngine"))) {
-      configure_tikzDevice()
-    }
-    device <- tikzDevice::tikz
-  } else {
-    device <- device
-  }
+  # Get the graphics device.
+  dev <- plot_dev(device, filename)
+  stopifnot(is.function(dev))
+
   # Save in the ratio of a beamer slide.
   # This aspect ratio works pretty well for normal latex too
   ggplot2::ggsave(filename = filename, plot = plt,
     width = 6.3 * scale_mult, height = 3.54 * scale_mult, units = "in",
-    device = device, bg = bg)
+    device = dev, bg = bg)
   invisible(plt)
 }
 

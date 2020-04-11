@@ -32,6 +32,26 @@ test_that("plotting code runs", {
 
   skip_if_not_installed("tikzDevice")
   temp_tikz <- tempfile(fileext=".tikz")
-  save_plot(plt, temp_tikz, device="tikz")
+  save_plot(plt, temp_tikz)
   expect_true(file.exists(temp_tikz))
+})
+
+
+# plot_dev ---------------------------------------------------------------------
+# copied from ggplot2's tests.
+test_that("function is passed back unchanged", {
+  expect_equal(plot_dev(png), png)
+})
+
+test_that("unknown device triggers error", {
+  expect_error(plot_dev("xyz"), "Unknown graphics device")
+  expect_error(plot_dev(NULL, "test.xyz"), "Unknown graphics device")
+})
+
+test_that("text converted to function", {
+  expect_identical(body(plot_dev("png"))[[1]], quote(grDevices::png))
+})
+
+test_that("if device is NULL, guess from extension", {
+  expect_identical(body(plot_dev(NULL, "test.png"))[[1]], quote(grDevices::png))
 })

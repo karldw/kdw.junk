@@ -87,6 +87,7 @@ pg_add_index <- function(con, table_name, indexed_col, unique_index = FALSE,
 #' @param table_name The name of a table in the postgresql database
 #' @param col_name Column names to check. Default doesn't check any.
 #' @return Nothing
+#' @noRd
 .pg_assert_existence <- function(con, table_name, col_name = NULL) {
   # TODO: can I make this work for temporary tables?
   if (! DBI::dbExistsTable(con, table_name)) {

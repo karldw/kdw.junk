@@ -4,7 +4,7 @@
 \alias{save_plot}
 \title{Save a ggplot plot}
 \usage{
-save_plot(plt, filename, scale_mult = 1, bg = "transparent", device = "pdf")
+save_plot(plt, filename, scale_mult = 1, bg = "transparent", device = NULL)
 }
 \arguments{
 \item{plt}{The plot created by \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}}
@@ -14,15 +14,14 @@ save_plot(plt, filename, scale_mult = 1, bg = "transparent", device = "pdf")
 \item{scale_mult}{A scale multiplier on the size. Defaults to 1; bigger
 numbers use a larger canvas.}
 
-\item{bg}{The background color, passed to the cairo_pdf device. The default
+\item{bg}{The background color, passed to the output device. The default
 is "transparent". If set to "transparent", the plot will be modified to make
 the \code{panel.background}, \code{plot.background}, \code{legend.background}, and
 \code{legend.box.background} transparent as well. Set it to "white" to retain
 the normal ggplot behavior.}
 
-\item{device}{The device to use. Defaults to \code{\link[grDevices:cairo_pdf]{grDevices::cairo_pdf()}} if
-available (and \code{\link[grDevices:pdf]{grDevices::pdf()}} if not). Use "tex" or "tikz" to save with
-\code{\link[tikzDevice:tikz]{tikzDevice::tikz()}}.}
+\item{device}{The device to use. Default depends on filename extension. Uses
+cairo_pdf devices when available. Use "tex" or "tikz" to save with \code{\link[tikzDevice:tikz]{tikzDevice::tikz()}}.}
 }
 \value{
 The plot (invisibly)
@@ -32,4 +31,13 @@ Save a ggplot plot
 }
 \seealso{
 \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}
+
+Opinionated device types:
+\itemize{
+\item \code{.pdf}: \code{\link[grDevices:cairo_pdf]{grDevices::cairo_pdf()}}
+\item \code{.tex} or \code{.tikz}: \code{\link[tikzDevice:tikz]{tikzDevice::tikz()}}
+\item \code{.svg}: \code{\link[svglite:svglite]{svglite::svglite()}}
+\item \code{.png}, \code{.jpeg}, \code{.jpg}, \code{.tiff}: Standard grDevices, but at 300 dpi
+\item Any thing else: not supported, but you can still pass a function
+}
 }
