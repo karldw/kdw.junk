@@ -32,6 +32,8 @@ test_that("is_id (NSE version) works", {
 
 test_that("is_id works for memdb", {
   skip_if_not_installed("dbplyr")
+  skip_if_not_installed("RSQLite")
+
   Loblolly <- dbplyr::memdb_frame(!!!Loblolly) # like tbl_memdb, but assign a unique name
   # SE tests
   expect_false(is_id(Loblolly, "Seed"))
