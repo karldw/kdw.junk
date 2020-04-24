@@ -68,22 +68,15 @@ is_id.data.frame <- function(df, ..., notifier = base::warning) {
 #' @export
 is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
   `.` <- NULL # make R CMD CHECK happy.
+  df <- dplyr::collect(df, 0L)
   df_names <- colnames(df)
-  claimed_id_vars <- tidyselect::vars_select(df_names, ...)
-  # Different approach than data.frame because of
-  # https://github.com/r-lib/tidyselect/issues/177
-  # claimed_id_vars <- df_names[tidyselect::eval_select(rlang::expr(c(...)), df)]
+
+  # eval_select checks if columns are missing
+  claimed_id_vars <- df_names[tidyselect::eval_select(rlang::expr(c(...)), df)]
 
   stopifnot(is.character(claimed_id_vars), length(claimed_id_vars) > 0,
             is.function(notifier))
 
-  not_found_vars <- base::setdiff(claimed_id_vars, df_names)
-  if (length(not_found_vars) > 0) {
-    err_msg <- sprintf("Claimed ID vars not in dataset: %s",
-                       paste(not_found_vars, collapse = ", "))
-    notifier(err_msg)
-    return(FALSE)
-  }
   any_vars <- dplyr::any_vars  # does nothing except satisfy R CMD CHECK
   df_id_cols_only <- dplyr::ungroup(dplyr::select(df, tidyselect::all_of(claimed_id_vars)))
   df_nas <- dplyr::filter_all(df_id_cols_only, any_vars(is.na(.)))

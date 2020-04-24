@@ -1,8 +1,41 @@
 context("testing reproducible graphics functions")
 
+# Note: these tests, particularly on PDFs, are a little flaky. That is,
+# sometimes the generated PDFs are actually different in ways that aren't just
+# the timestamp, but actually in the contents of the deflate block.
+# I don't know.
+
 plt <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg, color=disp)) +
   ggplot2::geom_point()
 
+
+expect_files_equal <- function(f1, f2, allow_empty=FALSE) {
+
+  are_files_equal <- function(files, allow_empty) {
+    if (!allow_empty && any(file.size(files) == 0L)) {
+      return(FALSE)
+    }
+    checksums <- tools::md5sum(files)
+    (!anyNA(checksums)) & (length(unique(checksums)) == 1L)
+  }
+  rate <- purrr::rate_backoff(pause_base=0.1, pause_min=0.005, pause_cap=10, max_times=Inf)
+  for (i in 1:7) {
+    res <- are_files_equal(c(f1, f2), allow_empty)
+    if (isTRUE(res)) {
+      break
+    }
+    purrr::rate_sleep(rate, quiet=FALSE)
+  }
+  # Note: I do still want to run all the code above to give the files a chance
+  err_msg <- ifelse(
+    all(file.exists(c(f1, f2))),
+    paste0("Files {f1} and {f2} are not the same\n",
+    "(sizes are {file.size('f1')} and {file.size('f2')})"),
+    "Files {f1} or {f2} don't exist"
+  )
+  testthat::expect(res, glue::glue(err_msg))
+  invisible(f1)
+}
 
 test_that("plotting code runs", {
   skip_if_not_installed("ggplot2")
@@ -21,25 +54,24 @@ test_that("plotting code runs", {
 test_that("device-as-function plots are made reproducible", {
   skip_if_not_installed("ggplot2")
   devices <- list(
-    # grDevices::pdf,
+    # function(filename, ...) grDevices::pdf(file=filename, ...),
     grDevices::cairo_ps,
     grDevices::cairo_pdf,
     grDevices::png,
-    # grDevices::postscript, pain to test because argument is called file
+    function(filename, ...) grDevices::postscript(file=filename, ...),
     grDevices::jpeg
   )
-  for (d in devices) {
-    tf1 <- tempfile()
-    tf2 <- tempfile()
-    save_plot(plt, tf1, device=d, reproducible=TRUE)
-    Sys.sleep(1) # make sure timestamps would be different
-    save_plot(plt, tf2, device=d, reproducible=TRUE)
-    expect_true(all(file.exists(c(tf1, tf2))))
-    expect_gt(file.size(tf2), 0)
-    checksums <- unname(tools::md5sum(c(tf1, tf2)))
-    expect_equal(checksums[1], checksums[2])
-    unlink(c(tf1, tf2))
+  save_plot_return_tempfile <- function(dev, plt) {
+    tf <- tempfile()
+    save_plot(plt, filename=tf, device=dev, reproducible=TRUE)
+    tf
   }
+
+  tf1 <- purrr::map_chr(devices, save_plot_return_tempfile, plt=plt)
+  Sys.sleep(1) # sleep so timestamps differ
+  tf2 <- purrr::map_chr(devices, save_plot_return_tempfile, plt=plt)
+  purrr::walk2(tf1, tf2, expect_files_equal)
+  unlink(c(tf1, tf2))
 })
 
 test_that("implicit device is reproducible", {
@@ -49,14 +81,12 @@ test_that("implicit device is reproducible", {
   tf4 <- tempfile(fileext=".jpg")
 
   save_plot(plt, tf1, reproducible=TRUE)
-  save_plot(plt, tf3, reproducible=TRUE)
-  Sys.sleep(1)
   save_plot(plt, tf2, reproducible=TRUE)
+  Sys.sleep(1) # sleep so timestamps differ
+  save_plot(plt, tf3, reproducible=TRUE)
   save_plot(plt, tf4, reproducible=TRUE)
-  Sys.sleep(0.5)
-  checksums <- unname(tools::md5sum(c(tf1, tf2, tf3, tf4)))
-  expect_equal(checksums[1], checksums[2])
-  expect_equal(checksums[3], checksums[4])
+  expect_files_equal(tf1, tf2)
+  expect_files_equal(tf3, tf4)
   unlink(c(tf1, tf2, tf3, tf4))
 })
 
@@ -65,9 +95,10 @@ test_that("non-reproducible remain non-reproducible", {
   tf2 <- tempfile(fileext=".pdf")
 
   save_plot(plt, tf1, reproducible=FALSE)
-  Sys.sleep(1)
+  Sys.sleep(1) # sleep so timestamps differ
   save_plot(plt, tf2, reproducible=FALSE)
   checksums <- unname(tools::md5sum(c(tf1, tf2)))
+  expect_true(!anyNA(checksums))
   expect_true(checksums[1] != checksums[2])
   unlink(c(tf1, tf2))
 })
