@@ -129,7 +129,8 @@ month_to_quarter <- function(mon, make_factor = FALSE) {
 #' @param path The file or connection's name
 #' @return The file or connection's extension
 #'
-#' In most cases, just apply [file_ext()], but include a special case for connections.
+#' In most cases, just apply `tolower(tools::file_ext()), but include a special
+#' case for connections.
 #' It's not required that the file exists.
 get_ext <- function(path) {
   stopifnot(length(path) == 1)
@@ -460,7 +461,7 @@ memory_limit <- function(size = NA) {
   } else if (os == "linux") {
     if (!requireNamespace("ulimit", quietly=TRUE)) {
       stop("Limiting memory on Linux requires the ulimit package. To install:\n",
-      "  devtools::install_github(krlmlr/ulimit)")
+      "  remotes::install_github('krlmlr/ulimit')")
     }
     limit <- ulimit::memory_limit(size)
   } else {
@@ -526,4 +527,47 @@ make_monthly <- function(x) {
     lubridate::month(x),
     1L
   )
+}
+
+#' Re-render a document as it changes
+#'
+#' @param input Filename of rmarkdown file
+#' @param ... Arguments passed on to [rmarkdown::render()]
+#' @param renderer A function to call to render the file. Defaults to
+#'   [rmarkdown::render()] for `.md` or `.rmd` files and [tinytex::lualatex()]
+#'   for `.tex` file. Provide a function for any other function.
+#'
+#' Use Ctrl + break (windows), Esc (mac gui) or Ctrl + C (command  line) to stop
+#' the watcher.
+#' @export
+auto_render <- function(input, ..., renderer=NULL) {
+  if (!requireNamespace("testthat", quietly=TRUE)) {
+    rlang::abort("testthat package is required to watch for changes")
+  }
+  if (!file.exists(input)) {
+    rlang::abort(glue::glue("File {input} not found"))
+  }
+  if (is.null(renderer)) {
+    renderer <- switch(get_ext(input),
+      "rmd" = rmarkdown::render,
+      "md" = rmarkdown::render,
+      "tex" = tinytex::lualatex,
+      rlang::abort(glue::glue("No default renderer for {input}"))
+    )
+  }
+  watcher <- function(added, deleted, modified) {
+    changed <- normalizePath(c(added, modified))
+    if (length(changed) > 0) {
+      renderer(changed[1], ...)
+    }
+    TRUE
+  }
+  renderer(input, ...)
+  # Easier to use testthat::watch than write our own watcher.
+  # This will be slightly inexact if the filename matches multiple files when
+  # interpreted as a pattern in dir(). (Only a problem if those files are also
+  # changing)
+  indir <- dirname(normalizePath(input, mustWork=TRUE, winslash="/"))
+  pattern <- basename(input)
+  testthat::watch(indir, callback=watcher, pattern=pattern, hash=TRUE)
 }

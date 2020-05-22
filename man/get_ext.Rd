@@ -12,7 +12,8 @@ get_ext(path)
 \value{
 The file or connection's extension
 
-In most cases, just apply \code{\link[=file_ext]{file_ext()}}, but include a special case for connections.
+In most cases, just apply `tolower(tools::file_ext()), but include a special
+case for connections.
 It's not required that the file exists.
 }
 \description{

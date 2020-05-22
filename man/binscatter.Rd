@@ -28,9 +28,11 @@ because I want the ease of Stata's binscatter.
 effects. This function is useful for plots, and is not recommended for inference.
 }
 \examples{
-res <- binscatter(Sepal.Length ~ Sepal.Width + Petal.Length | Species, iris)
-print(res$bins_plot)
-res <- binscatter(Sepal.Length ~ Sepal.Width + Petal.Length | Species, iris, x="Petal.Length")
+if (requireNamespace("binsreg", quietly=TRUE)) {
+  res <- binscatter(Sepal.Length ~ Sepal.Width + Petal.Length | Species, iris)
+  print(res$bins_plot)
+  res <- binscatter(Sepal.Length ~ Sepal.Width + Petal.Length | Species, iris, x="Petal.Length")
+}
 }
 \seealso{
 \code{\link[binsreg:binsreg]{binsreg::binsreg()}}, \code{\link[lfe:felm]{lfe::felm()}}

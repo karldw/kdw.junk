@@ -17,9 +17,11 @@
 #' @seealso [binsreg::binsreg()], [lfe::felm()]
 #'
 #' @examples
-#' res <- binscatter(Sepal.Length ~ Sepal.Width + Petal.Length | Species, iris)
-#' print(res$bins_plot)
-#' res <- binscatter(Sepal.Length ~ Sepal.Width + Petal.Length | Species, iris, x="Petal.Length")
+#' if (requireNamespace("binsreg", quietly=TRUE)) {
+#'   res <- binscatter(Sepal.Length ~ Sepal.Width + Petal.Length | Species, iris)
+#'   print(res$bins_plot)
+#'   res <- binscatter(Sepal.Length ~ Sepal.Width + Petal.Length | Species, iris, x="Petal.Length")
+#' }
 #' @export
 binscatter <- function(formula, data, x = NULL, ..., weights = NULL) {
   if (!requireNamespace("binsreg", quietly=TRUE)) {
