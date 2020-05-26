@@ -1,5 +1,9 @@
 # kdw.junk
 
+<!-- badges: start -->
+ [![R build status](https://github.com/karldw/kdw.junk/workflows/R-CMD-check/badge.svg)](https://github.com/karldw/kdw.junk/actions)
+<!-- badges: end -->
+
 Miscellaneous R functions Karl wanted to reuse.  Inspired by [kimisc](https://github.com/krlmlr/kimisc/).
 
 For a similar grab-bag of Python and Stata scripts, see https://github.com/karldw/useful_scripts.
