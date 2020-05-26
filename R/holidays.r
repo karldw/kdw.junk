@@ -120,7 +120,7 @@ hol_george_washington_birthday <- function(years){
 
 #' @rdname holidays
 #' @export
-presidents_day <- hol_george_washington_birthday
+hol_presidents_day <- hol_george_washington_birthday
 
 #' @rdname holidays
 #' @export

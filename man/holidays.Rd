@@ -6,7 +6,7 @@
 \alias{hol_new_years_day}
 \alias{hol_martin_luther_king_day}
 \alias{hol_george_washington_birthday}
-\alias{presidents_day}
+\alias{hol_presidents_day}
 \alias{hol_memorial_day}
 \alias{hol_independence_day}
 \alias{hol_labor_day}
@@ -27,7 +27,7 @@ hol_martin_luther_king_day(years)
 
 hol_george_washington_birthday(years)
 
-presidents_day(years)
+hol_presidents_day(years)
 
 hol_memorial_day(years)
 

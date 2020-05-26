@@ -154,7 +154,6 @@ get_ext <- function(path) {
 #'
 #' In most cases, just apply [tools::file_path_sans_ext()], but include a special case for connections.
 #' It's not required that the file exists.
-#' @export
 remove_ext <- function(path) {
   # The summary bit only works on single connections, so be recursive if necessary.
   if (length(path) > 1) {

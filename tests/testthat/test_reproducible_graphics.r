@@ -117,3 +117,10 @@ test_that("get device categories works", {
   expect_equal(get_dev_category("x.jpg", NULL), "jpeg")
   expect_equal(get_dev_category("x", "tikz"), "tikz")
 })
+
+test_that("writing multiple files works", {
+  tf1 <- tempfile(fileext=".pdf")
+  tf2 <- tempfile(fileext=".png")
+  save_plot(plt, c(tf1, tf2), reproducible=FALSE)
+  expect_true(all(file.exists(c(tf1, tf2))))
+})

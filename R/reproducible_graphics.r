@@ -3,7 +3,7 @@
 #' Save a ggplot plot
 #'
 #' @param plot The plot created by [ggplot2::ggplot()]
-#' @param filename The filename to save (save type depends on extension)
+#' @param filename The filename(s) to save (save type depends on extension)
 #' @param scale_mult A scale multiplier on the size. Defaults to 1; bigger
 #' numbers use a larger canvas.
 #' @param bg The background color, passed to the output device. The default
@@ -13,10 +13,12 @@
 #' the normal ggplot behavior.
 #' @param device The device to use. Default depends on filename extension. Uses
 #' cairo_pdf devices when available. Use "tex" or "tikz" to save with [tikzDevice::tikz()].
-#' @param reproducible Logical, default FALSE unless the `SOURCE_DATE_EPOCH`
-#' environment variable or `SOURCE_DATE_EPOCH` R option is set. If reproducible,
-#' `save_plot` will attempt to create a reproducible output, with creation date
-#' depending on `SOURCE_DATE_EPOCH`.
+#' @param reproducible Logical. Should we try to make the plot reproducible by
+#' resetting the embedded timestamp? Defaults to false unless the `SOURCE_DATE_EPOCH`
+#' environment variable or `SOURCE_DATE_EPOCH` R option is set. If `reproducible`
+#' is `TRUE` and `SOURCE_DATE_EPOCH` isn't set, the timestamp we reset to is
+#' 1970-01-01 00:00:00 UTC. Other sources of non-reproducibility aren't handled.
+#' Requires system `sed` command.
 #'
 #' @return The plot (invisibly)
 #' @seealso [ggplot2::ggsave()] https://reproducible-builds.org/docs/source-date-epoch/
@@ -29,6 +31,15 @@
 #' @export
 save_plot <- function(plot, filename, scale_mult = 1, bg = "transparent", device=NULL, reproducible=NULL) {
   force(plot)
+  if (length(filename) > 1) {
+    for (fl in filename) {
+      save_plot(
+        plot=plot, filename=fl,
+        scale_mult=scale_mult, bg=bg, device=device, reproducible=reproducible
+      )
+    }
+    return(invisible(plot))
+  }
   stopifnot(dir.exists(dirname(filename)))
   if (identical(bg, "transparent")) {
     plot <- plot + ggplot2::theme(
@@ -47,6 +58,10 @@ save_plot <- function(plot, filename, scale_mult = 1, bg = "transparent", device
     )
     device <- dev_list[[tolower(tools::file_ext(filename))]]
   }
+  # By default, check if R option or system variable SOURCE_DATE_EPOCH is set
+  # and can be parsed as a POSIXct. If so, we'll try to reset the file timestamp
+  # to that datetime. If `reproducible` is just `TRUE`, then we'll reset to
+  # 1970-01-01 00:00:00 UTC
   if (is.null(reproducible)) {
     reproducible <- is.null(read_source_date_epoch())
   }

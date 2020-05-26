@@ -16,7 +16,7 @@ save_plot(
 \arguments{
 \item{plot}{The plot created by \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}}
 
-\item{filename}{The filename to save (save type depends on extension)}
+\item{filename}{The filename(s) to save (save type depends on extension)}
 
 \item{scale_mult}{A scale multiplier on the size. Defaults to 1; bigger
 numbers use a larger canvas.}
@@ -30,10 +30,12 @@ the normal ggplot behavior.}
 \item{device}{The device to use. Default depends on filename extension. Uses
 cairo_pdf devices when available. Use "tex" or "tikz" to save with \code{\link[tikzDevice:tikz]{tikzDevice::tikz()}}.}
 
-\item{reproducible}{Logical, default FALSE unless the \code{SOURCE_DATE_EPOCH}
-environment variable or \code{SOURCE_DATE_EPOCH} R option is set. If reproducible,
-\code{save_plot} will attempt to create a reproducible output, with creation date
-depending on \code{SOURCE_DATE_EPOCH}.}
+\item{reproducible}{Logical. Should we try to make the plot reproducible by
+resetting the embedded timestamp? Defaults to false unless the \code{SOURCE_DATE_EPOCH}
+environment variable or \code{SOURCE_DATE_EPOCH} R option is set. If \code{reproducible}
+is \code{TRUE} and \code{SOURCE_DATE_EPOCH} isn't set, the timestamp we reset to is
+1970-01-01 00:00:00 UTC. Other sources of non-reproducibility aren't handled.
+Requires system \code{sed} command.}
 }
 \value{
 The plot (invisibly)
