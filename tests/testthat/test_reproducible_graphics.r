@@ -8,6 +8,7 @@ context("testing reproducible graphics functions")
 plt <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg, color=disp)) +
   ggplot2::geom_point()
 
+SED_AVAILABLE <- system2("sed", "--version", stderr=FALSE, stdout=FALSE) == 0
 
 expect_files_equal <- function(f1, f2, allow_empty=FALSE) {
 
@@ -53,6 +54,7 @@ test_that("plotting code runs", {
 
 test_that("device-as-function plots are made reproducible", {
   skip_if_not_installed("ggplot2")
+  skip_if_not(SED_AVAILABLE)
   devices <- list(
     # function(filename, ...) grDevices::pdf(file=filename, ...),
     grDevices::cairo_ps,
@@ -75,6 +77,7 @@ test_that("device-as-function plots are made reproducible", {
 })
 
 test_that("implicit device is reproducible", {
+  skip_if_not(SED_AVAILABLE)
   tf1 <- tempfile(fileext=".pdf")
   tf2 <- tempfile(fileext=".pdf")
   tf3 <- tempfile(fileext=".jpg")
