@@ -10,7 +10,7 @@ plt <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg, color=disp)) +
 
 SED_AVAILABLE <- system2("sed", "--version", stderr=FALSE, stdout=FALSE) == 0
 
-wait_until_files_exist <- function(files, allow_empty=FALSE) {
+check_files_exist <- function(files, allow_empty=FALSE) {
   # Waits for a while, returns TRUE/FALSE for whether files eventually exist
   rate <- purrr::rate_backoff(pause_base=0.01, pause_min=0.005, pause_cap=10, max_times=Inf)
   files_exist <- FALSE
@@ -26,7 +26,7 @@ wait_until_files_exist <- function(files, allow_empty=FALSE) {
 }
 
 expect_files_equal <- function(f1, f2, allow_empty=FALSE) {
-  files_exist <- wait_until_files_exist(c(f1, f2), allow_empty=allow_empty)
+  files_exist <- check_files_exist(c(f1, f2), allow_empty=allow_empty)
   res <- files_exist && (length(unique(tools::md5sum(c(f1, f2)))) == 1L)
 
   # Note: I do still want to run all the code above to give the files a chance
@@ -41,22 +41,24 @@ expect_files_equal <- function(f1, f2, allow_empty=FALSE) {
 }
 
 test_that("plotting code runs", {
+  skip_on_ci()
   skip_if_not_installed("ggplot2")
   plt <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
     ggplot2::geom_point()
   temp_pdf <- tempfile(fileext = ".pdf")
   save_plot(plt, temp_pdf, reproducible=FALSE)
-  expect_true(wait_until_files_exist(temp_pdf))
+  expect_true(check_files_exist(temp_pdf))
 
   skip_if_not_installed("tikzDevice")
   temp_tikz <- tempfile(fileext=".tikz")
   save_plot(plt, temp_tikz, reproducible=FALSE)
-  expect_true(wait_until_files_exist(temp_tikz))
+  expect_true(check_files_exist(temp_tikz))
 })
 
 test_that("device-as-function plots are made reproducible", {
   skip_if_not_installed("ggplot2")
   skip_if_not(SED_AVAILABLE)
+  skip_on_ci()
   devices <- list(
     # function(filename, ...) grDevices::pdf(file=filename, ...),
     grDevices::cairo_ps,
@@ -80,6 +82,7 @@ test_that("device-as-function plots are made reproducible", {
 
 test_that("implicit device is reproducible", {
   skip_if_not(SED_AVAILABLE)
+  skip_on_ci()
   tf1 <- tempfile(fileext=".pdf")
   tf2 <- tempfile(fileext=".pdf")
   tf3 <- tempfile(fileext=".jpg")
@@ -96,6 +99,7 @@ test_that("implicit device is reproducible", {
 })
 
 test_that("non-reproducible remain non-reproducible", {
+  skip_on_ci()
   skip_if_not_installed("ggplot2")
   tf1 <- tempfile(fileext=".pdf")
   tf2 <- tempfile(fileext=".pdf")
@@ -103,7 +107,7 @@ test_that("non-reproducible remain non-reproducible", {
   save_plot(plt, tf1, reproducible=FALSE)
   Sys.sleep(1) # sleep so timestamps differ
   save_plot(plt, tf2, reproducible=FALSE)
-  files_exist <- wait_until_files_exist(c(tf1, tf2))
+  files_exist <- check_files_exist(c(tf1, tf2))
 
   checksums <- unname(tools::md5sum(c(tf1, tf2)))
   expect_true(!anyNA(checksums))
@@ -128,10 +132,11 @@ test_that("get device categories works", {
 
 test_that("writing multiple files works", {
   skip_if_not_installed("ggplot2")
+  skip_on_ci()
   tf1 <- tempfile(fileext=".pdf")
   tf2 <- tempfile(fileext=".png")
   save_plot(plt, c(tf1, tf2), reproducible=FALSE)
-  files_exist <- wait_until_files_exist(c(tf1, tf2))
+  files_exist <- check_files_exist(c(tf1, tf2))
   expect_true(files_exist)
   unlink(c(tf1, tf2))
 })
