@@ -58,7 +58,8 @@ test_that("winsorize works with grouped dataframes", {
   res <- dplyr::group_by(mtcars, cyl) %>%
     dplyr::transmute(wt = winsorize(wt)) %>%
     dplyr::ungroup() %>%
-    dplyr::arrange(cyl)
+    dplyr::arrange(cyl) %>%
+    as.data.frame() # Compat with dplyr 1.0's removal of all.equal.tbl_df
   cyl4_wins <- winsorize(mtcars[mtcars$cyl == 4, ]$wt)
   cyl6_wins <- winsorize(mtcars[mtcars$cyl == 6, ]$wt)
   cyl8_wins <- winsorize(mtcars[mtcars$cyl == 8, ]$wt)
