@@ -22,6 +22,7 @@ is_id <- function(df, ..., notifier = base::warning) {
   UseMethod("is_id")
 }
 
+#' @export
 is_id.sf <- function(df, ..., notifier = base::warning) {
   df <- sf::st_drop_geometry(df)
   NextMethod()
