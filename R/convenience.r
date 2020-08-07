@@ -458,16 +458,20 @@ memory_limit <- function(size = NA) {
   if (os == "win") {
     limit <- utils::memory.limit(size)
   } else if (os == "linux") {
-    if (!requireNamespace("ulimit", quietly=TRUE)) {
-      stop("Limiting memory on Linux requires the ulimit package. To install:\n",
-      "  remotes::install_github('krlmlr/ulimit')")
+    if (!requireNamespace("unix", quietly=TRUE)) {
+      stop("Limiting memory on linux requires the 'unix' package")
     }
-    limit <- ulimit::memory_limit(size)
+    if (is.na(size)) {
+      size <- NULL
+    } else {
+      size <- size * (1024^2) # rlimit_as expects bytes
+    }
+    limit <- unix::rlimit_as(size)$cur
   } else {
     warning("Sorry, memory limits on OS X are not supported")
     limit <- NULL
   }
-  limit
+  invisible(limit)
 }
 
 #' Make names nicer to work with

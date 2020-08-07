@@ -39,5 +39,5 @@ inner_join(mtcars, mtcars, by = 'cyl')  # error
 }
 }
 \seealso{
-\code{\link[=merge]{merge()}}, \code{\link[dplyr:inner_join]{dplyr::inner_join()}}
+\code{\link[=merge]{merge()}}, \code{\link[dplyr:mutate-joins]{dplyr::inner_join()}}
 }

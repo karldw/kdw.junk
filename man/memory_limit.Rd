@@ -14,7 +14,7 @@ A vector with the (new) limit, in MiB.
 }
 \description{
 For Linux (or BSD), this function calls \code{\link[ulimit:memory_limit]{ulimit::memory_limit()}}
-For Windows, this function calls \code{\link[utils:memory.limit]{utils::memory.limit()}}
+For Windows, this function calls \code{\link[utils:memory.size]{utils::memory.limit()}}
 For Mac OS X, no limiting is available.
 }
 \seealso{

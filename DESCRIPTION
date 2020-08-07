@@ -1,7 +1,7 @@
 Package: kdw.junk
 Title: Miscellaneous Functions Karl Found Useful
-Version: 0.0.30
-Date: 2020-05-26
+Version: 0.0.31
+Date: 2020-08-27
 Authors@R: person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("aut", "cre"))
 Description: A variety of functions, mostly interacting with the tidyverse.
 Depends: R (>= 3.3.0)
@@ -10,7 +10,7 @@ URL: https://github.com/karldw/kdw.junk/
 BugReports: https://github.com/karldw/kdw.junk/issues/
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 SystemRequirements: `sed` (only for reproducible graphics)
 Imports:
@@ -39,6 +39,4 @@ Suggests:
     tibble,
     tikzDevice (>= 0.12.2),
     tinytex,
-    ulimit,
-Remotes:
-    github::krlmlr/ulimit,
+    unix,

@@ -25,5 +25,5 @@ The result, as if passed to \code{\link[=lapply]{lapply()}}
 DEPRECATED: Run lapply then bind_rows, with multicore
 }
 \seealso{
-\code{\link[purrr:map_df]{purrr::map_df()}}, \code{\link[dplyr:bind_rows]{dplyr::bind_rows()}}
+\code{\link[purrr:map]{purrr::map_df()}}, \code{\link[dplyr:bind]{dplyr::bind_rows()}}
 }

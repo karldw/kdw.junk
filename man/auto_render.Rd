@@ -12,7 +12,7 @@ auto_render(input, ..., renderer = NULL)
 \item{...}{Arguments passed on to \code{\link[rmarkdown:render]{rmarkdown::render()}}}
 
 \item{renderer}{A function to call to render the file. Defaults to
-\code{\link[rmarkdown:render]{rmarkdown::render()}} for \code{.md} or \code{.rmd} files and \code{\link[tinytex:lualatex]{tinytex::lualatex()}}
+\code{\link[rmarkdown:render]{rmarkdown::render()}} for \code{.md} or \code{.rmd} files and \code{\link[tinytex:latexmk]{tinytex::lualatex()}}
 for \code{.tex} file. Provide a function for any other function.
 
 Use Ctrl + break (windows), Esc (mac gui) or Ctrl + C (command  line) to stop

@@ -12,7 +12,7 @@ remove_ext(path)
 \value{
 The file or connection's name without extension
 
-In most cases, just apply \code{\link[tools:file_path_sans_ext]{tools::file_path_sans_ext()}}, but include a special case for connections.
+In most cases, just apply \code{\link[tools:fileutils]{tools::file_path_sans_ext()}}, but include a special case for connections.
 It's not required that the file exists.
 }
 \description{
