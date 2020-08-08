@@ -456,12 +456,15 @@ rename_cols <- function(.tbl, .vars, strict = TRUE) {
 memory_limit <- function(size = NA) {
   os <- get_os()
   if (os == "win") {
+    if (is.null(size)) {
+      size <- NA
+    }
     limit <- utils::memory.limit(size)
   } else if (os == "linux") {
     if (!requireNamespace("unix", quietly=TRUE)) {
       stop("Limiting memory on linux requires the 'unix' package")
     }
-    if (is.na(size)) {
+    if (is.null(size) || is.na(size)) {
       size <- NULL
     } else {
       size <- size * (1024^2) # rlimit_as expects bytes

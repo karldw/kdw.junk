@@ -21,3 +21,10 @@ test_that("make_better_names works as expected", {
   improved_names <- c("x", "x_1", "x_2", "x_1_1")
   expect_equal(make_better_names(orig_names), improved_names)
 })
+
+test_that("memory_limit runs", {
+  skip_on_os("mac")
+  expect_equal(memory_limit(NA), Inf)
+  expect_equal(memory_limit(NULL), Inf)
+  memory_limit(Inf)
+})
