@@ -63,7 +63,7 @@ save_plot <- function(plot, filename, scale_mult = 1, bg = "transparent", device
   # to that datetime. If `reproducible` is just `TRUE`, then we'll reset to
   # 1970-01-01 00:00:00 UTC
   if (is.null(reproducible)) {
-    reproducible <- is.null(read_source_date_epoch())
+    reproducible <- !is.null(read_source_date_epoch())
   }
   if (reproducible) {
     # Make a tempfile with the same extension as filename so type can be parsed

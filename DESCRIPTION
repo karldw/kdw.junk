@@ -1,7 +1,7 @@
 Package: kdw.junk
 Title: Miscellaneous Functions Karl Found Useful
-Version: 0.0.31
-Date: 2020-08-27
+Version: 0.0.32
+Date: 2020-10-01
 Authors@R: person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("aut", "cre"))
 Description: A variety of functions, mostly interacting with the tidyverse.
 Depends: R (>= 3.3.0)
