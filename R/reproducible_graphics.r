@@ -65,6 +65,10 @@ save_plot <- function(plot, filename, scale_mult = 1, bg = "transparent", device
   if (is.null(reproducible)) {
     reproducible <- !is.null(read_source_date_epoch())
   }
+  if (reproducible && (!is_sed_available())) {
+    warning("Reproducible graphics (currently) depend on having a system sed command")
+    reproducible <- FALSE
+  }
   if (reproducible) {
     # Make a tempfile with the same extension as filename so type can be parsed
     ggsave_file <- tempfile(fileext=paste0(".", tools::file_ext(filename)))
@@ -159,6 +163,11 @@ reset_datestamp <- function(infile, outfile, category) {
   substitute_text(infile, outfile, inregex, outregex)
 }
 
+is_sed_available <- function() {
+  suppressWarnings(rc <- system2("sed", "--version", stderr=FALSE, stdout=FALSE))
+  rc == 0
+}
+
 substitute_text <- function(infile, outfile, inregex, outregex) {
   # This could definitely be done in R, but it seems like a pain.
   stopifnot(is.character(infile), length(infile) == 1, is.character(outfile),
@@ -167,8 +176,7 @@ substitute_text <- function(infile, outfile, inregex, outregex) {
   if (any(grepl('"', c(inregex, outregex), fixed=TRUE))) {
     stop("This substitution function isn't designed to handle regex that include double quotes. Sorry.")
   }
-  suppressWarnings(rc <- system2("sed", "--version", stderr=FALSE, stdout=FALSE))
-  if (rc != 0) {
+  if (!is_sed_available()) {
     stop("Text substitution depends on having the system `sed` command available")
   }
   sed_regex <- paste0(
