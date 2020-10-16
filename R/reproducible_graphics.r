@@ -165,7 +165,8 @@ reset_datestamp <- function(infile, outfile, category) {
 
 is_sed_available <- function() {
   suppressWarnings(rc <- system2("sed", "--version", stderr=FALSE, stdout=FALSE))
-  rc == 0
+  can_use_sed <- (rc == 0) && (get_os() != "win")
+  can_use_sed
 }
 
 substitute_text <- function(infile, outfile, inregex, outregex) {
