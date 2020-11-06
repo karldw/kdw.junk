@@ -5,7 +5,7 @@
 #' @param plot The plot created by [ggplot2::ggplot()]
 #' @param filename The filename(s) to save (save type depends on extension)
 #' @param scale_mult A scale multiplier on the size. Defaults to 1; bigger
-#' numbers use a larger canvas.
+#' numbers use a larger canvas. (If length 2, multiply width and height)
 #' @param bg The background color, passed to the output device. The default
 #' is "transparent". If set to "transparent", the plot will be modified to make
 #' the `panel.background`, `plot.background`, `legend.background`, and
@@ -40,7 +40,7 @@ save_plot <- function(plot, filename, scale_mult = 1, bg = "transparent", device
     }
     return(invisible(plot))
   }
-  stopifnot(dir.exists(dirname(filename)))
+  stopifnot(dir.exists(dirname(filename)), length(scale_mult) %in% 1:2)
   if (identical(bg, "transparent")) {
     plot <- plot + ggplot2::theme(
       # Borrowed from https://stackoverflow.com/a/41878833
@@ -81,8 +81,11 @@ save_plot <- function(plot, filename, scale_mult = 1, bg = "transparent", device
   }
   # Save in the ratio of a beamer slide.
   # This aspect ratio works pretty well for normal latex too
+  if (length(scale_mult) == 1) {
+    scale_mult <- c(scale_mult, scale_mult)
+  }
   ggplot2::ggsave(filename = ggsave_file, plot = plot,
-    width = 6.3 * scale_mult, height = 3.54 * scale_mult, units = "in",
+    width = 6.3 * scale_mult[1], height = 3.54 * scale_mult[2], units = "in",
     device = device, bg = bg)
   if (reproducible) {
     reset_datestamp(infile=ggsave_file, outfile=filename, category=dev_category)

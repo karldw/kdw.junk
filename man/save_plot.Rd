@@ -19,7 +19,7 @@ save_plot(
 \item{filename}{The filename(s) to save (save type depends on extension)}
 
 \item{scale_mult}{A scale multiplier on the size. Defaults to 1; bigger
-numbers use a larger canvas.}
+numbers use a larger canvas. (If length 2, multiply width and height)}
 
 \item{bg}{The background color, passed to the output device. The default
 is "transparent". If set to "transparent", the plot will be modified to make
