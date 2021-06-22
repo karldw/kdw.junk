@@ -24,6 +24,7 @@ test_that("make_better_names works as expected", {
 
 test_that("memory_limit runs", {
   skip_on_os("mac")
+  skip_if_not_installed("unix")
   expect_equal(memory_limit(NA), Inf)
   expect_equal(memory_limit(NULL), Inf)
   memory_limit(Inf)

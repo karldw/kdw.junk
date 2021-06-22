@@ -24,5 +24,7 @@ The result from \code{felm()}
 Make felm slightly easier to use for someone who forgets to check things
 }
 \examples{
-felm_strict(cyl ~ wt, mtcars)
+if (requireNamespace("lfe", quietly=TRUE)) {
+  felm_strict(cyl ~ wt, mtcars)
+}
 }

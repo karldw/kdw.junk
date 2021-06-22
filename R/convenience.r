@@ -292,7 +292,9 @@ vec2string <- function(x, quoted = TRUE, add_and = TRUE) {
 #' @param strict Should felm's warnings be treated as errors? Default true.
 #' @return The result from `felm()`
 #' @examples
-#' felm_strict(cyl ~ wt, mtcars)
+#' if (requireNamespace("lfe", quietly=TRUE)) {
+#'   felm_strict(cyl ~ wt, mtcars)
+#' }
 #' @export
 felm_strict <- function(formula, data, ..., dates_as_factor = TRUE, strict = TRUE) {
   if (strict) {
@@ -445,7 +447,7 @@ rename_cols <- function(.tbl, .vars, strict = TRUE) {
 
 #' Get or set memory limits
 #'
-#' For Linux (or BSD), this function calls [ulimit::memory_limit()]
+#' For Linux (or BSD), this function calls [unix::rlimit_as()]
 #' For Windows, this function calls [utils::memory.limit()]
 #' For Mac OS X, no limiting is available.
 #'
