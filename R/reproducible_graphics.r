@@ -47,6 +47,7 @@ save_plot <- function(plot, filename, scale_mult = 1, bg = "transparent", device
       panel.background      = ggplot2::element_rect(fill = "transparent", color = NA),
       plot.background       = ggplot2::element_rect(fill = "transparent", color = NA),
       legend.background     = ggplot2::element_rect(fill = "transparent", color = NA),
+      legend.key            = ggplot2::element_rect(fill = "transparent", color = NA),
       legend.box.background = ggplot2::element_rect(fill = "transparent", color = NA)
     )
   }
