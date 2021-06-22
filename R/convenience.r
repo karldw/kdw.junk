@@ -579,3 +579,83 @@ auto_render <- function(input, ..., renderer=NULL) {
   pattern <- basename(input)
   testthat::watch(indir, callback=watcher, pattern=pattern, hash=TRUE)
 }
+
+
+#' Detect function conflicts between packages
+#'
+#' @return A list of character vectors of conflicting functions (invisibly)
+#'
+#' Mostly useful for the side-effect of printing conflicting functions.
+#'
+#' This function draws heavily from [tidyverse::tidyverse_conflicts()], except
+#' it finds any conflicts (not just with tidyverse packages), and it's got no
+#' dependencies beyond base R (>= 3.0ish)
+#'
+#' Note that this function detects conflicts between *attached* packages, not
+#' packages and user-defined functions, or packages that haven't been attached.
+detect_function_conflicts <- function() {
+  invert <- function (x) {
+    if (length(x) == 0) {
+      return()
+    }
+    stacked <- utils::stack(x)
+    tapply(as.character(stacked$ind), stacked$values, list)
+  }
+  ls_env <- function (env) {
+    x <- ls(pos = env)
+    if (identical(env, "package:dplyr")) {
+      x <- setdiff(x, c("intersect", "setdiff", "setequal", "union"))
+    }
+    x
+  }
+  confirm_conflict <- function (packages, name) {
+    objs <- lapply(packages, function(x) get(name, pos = x))
+    objs <- Filter(is.function, objs)
+    if (length(objs) <= 1) {
+      return()
+    }
+    objs <- objs[!duplicated(objs)]
+    packages <- packages[!duplicated(packages)]
+    if (length(objs) == 1) {
+      return()
+    }
+    # Ignore "kronecker" and "body<-" conflicts between base and methods.
+    if (setequal(packages, c("package:base", "package:methods"))) {
+      return()
+    }
+    packages
+  }
+  length_gt_1 <- function(x) {
+    length(x) > 1
+  }
+  compact <- function(x) {
+    # purrr::compact, implemented in base R
+    Filter(Negate(is.null), x)
+  }
+  conflict_message <- function(conflict_funs) {
+    pkgs <- lapply(conflict_funs, function(x) gsub("^package:", "", x))
+    winner <- lapply(pkgs, function(x) x[1])
+    others <- lapply(pkgs, function(x) x[-1])
+    msg <- vector(length=length(winner), mode="character")
+    for (i in seq_along(winner)) {
+      # Produce a line like "dplyr::filter() masks stats::filter()"
+      fn_name <- names(winner[i])
+      # others[i] might have length > 1.
+      # paste() duplicates fn_name before collapsing
+      msg[i] <- paste0(winner[i], "::", fn_name, "() masks ",
+        paste0(others[i], "::", fn_name, "()", collapse=", ")
+      )
+    }
+    paste0(msg, collapse="\n")
+  }
+
+  envs <- grep("^package:", search(), value = TRUE)
+  names(envs) <- envs
+  objs <- invert(lapply(envs, ls_env))
+  conflicts <- Filter(length_gt_1, objs)
+  conflict_funs <- mapply(confirm_conflict, conflicts, names(conflicts))
+  conflict_funs <- compact(conflict_funs)
+  msg <- conflict_message(conflict_funs)
+  message(msg)
+  invisible(conflict_funs)
+}
