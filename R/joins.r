@@ -19,6 +19,7 @@ nrow.default <- function(x, force = FALSE) {
 
 #' @export
 nrow.tbl_lazy <- function(x, force = FALSE) {
+  stop_if_not_installed("dplyr", "nrow.tbl_lazy requires dplyr")
   if (!force) {
     res <- base::nrow(x)
   } else {
@@ -30,7 +31,7 @@ nrow.tbl_lazy <- function(x, force = FALSE) {
 }
 
 
-#' Make a join function safer.
+#' DEPRECATED: Make a join function safer.
 #'
 #' @param join_fn Original join function to wrap
 #' @param fast Boolean, should the check be fast or thorough (defaults to fast)
@@ -51,15 +52,15 @@ nrow.tbl_lazy <- function(x, force = FALSE) {
 #'
 #' @seealso [merge()], [dplyr::inner_join()]
 #' @examples
+#' \dontrun{
 #' nrow(mtcars)  # 32
 #' nrow(dplyr::inner_join(mtcars, mtcars, by = 'cyl'))  # 366
 #' inner_join <- make_join_safer(dplyr::inner_join)
-#' \dontrun{
 #' inner_join(mtcars, mtcars, by = 'cyl')  # error
 #' }
 #' @export
 make_join_safer <- function(join_fn, fast = TRUE) {
-
+  stop("make_join_safer is deprecated. Use safejoin instead (https://github.com/moodymudskipper/safejoin)")
   check_name_clash <- function(x, y, by) {
     if (is.null(names(by))) {
       names_x_by <- by
@@ -169,7 +170,7 @@ make_join_safer <- function(join_fn, fast = TRUE) {
 }
 
 
-#' Use dplyr to emulate Stata merges.
+#' DEPRECATED: Use dplyr to emulate Stata merges.
 #'
 #' @param x A dataframe to merge ('master' in Stata)
 #' @param y A dataframe to merge ('using' in Stata)
@@ -186,6 +187,7 @@ make_join_safer <- function(join_fn, fast = TRUE) {
 #' @export
 merge_stata <- function(x, y, multi = c("1:1", "1:m", "m:1", "1:1 _n"),
     by = NULL, keep = "inner", keepusing = NULL, ...) {
+  stop("merge_stata is deprecated. Use safejoin instead (https://github.com/moodymudskipper/safejoin)")
   mutli <- match.arg(multi)
 
   select_keepusing <- function(y, by, keepusing) {

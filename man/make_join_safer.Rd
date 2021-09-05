@@ -2,7 +2,7 @@
 % Please edit documentation in R/joins.r
 \name{make_join_safer}
 \alias{make_join_safer}
-\title{Make a join function safer.}
+\title{DEPRECATED: Make a join function safer.}
 \usage{
 make_join_safer(join_fn, fast = TRUE)
 }
@@ -28,13 +28,13 @@ If fast == FALSE, make sure that the by variables uniquely identify rows in
 at least one of the tables before doing the join.
 }
 \description{
-Make a join function safer.
+DEPRECATED: Make a join function safer.
 }
 \examples{
+\dontrun{
 nrow(mtcars)  # 32
 nrow(dplyr::inner_join(mtcars, mtcars, by = 'cyl'))  # 366
 inner_join <- make_join_safer(dplyr::inner_join)
-\dontrun{
 inner_join(mtcars, mtcars, by = 'cyl')  # error
 }
 }

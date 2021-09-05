@@ -24,12 +24,14 @@ is_id <- function(df, ..., notifier = base::warning) {
 
 #' @export
 is_id.sf <- function(df, ..., notifier = base::warning) {
+  stop_if_not_installed("sf")
   df <- sf::st_drop_geometry(df)
   NextMethod()
 }
 
 #' @export
 is_id.data.frame <- function(df, ..., notifier = base::warning) {
+  stop_if_not_installed("tidyselect")
   df_names <- colnames(df)
   # eval_select checks if columns are missing
   claimed_id_vars <- df_names[tidyselect::eval_select(rlang::expr(c(...)), df)]
@@ -69,6 +71,7 @@ is_id.data.frame <- function(df, ..., notifier = base::warning) {
 #' @export
 is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
   `.` <- NULL # make R CMD CHECK happy.
+  stop_if_not_installed("dplyr")
   df <- dplyr::collect(df, 0L)
   df_names <- colnames(df)
 
@@ -110,6 +113,7 @@ is_id.tbl_lazy <- function(df, ..., notifier = base::warning) {
 #' @return Original `df`
 #' @export
 ensure_id_vars <- function(df, ...) {
+  stop_if_not_installed("tidyselect")
   if (! isTRUE(is_id(df, ..., notifier = base::stop))) {
     claimed_id_vars <- tidyselect::vars_select(colnames(df), ...)
     stop("Variables don't uniquely identify rows: ",

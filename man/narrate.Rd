@@ -2,7 +2,7 @@
 % Please edit documentation in R/convenience.r
 \name{narrate}
 \alias{narrate}
-\title{Message to the user}
+\title{DEPRECATED: Message to the user}
 \usage{
 narrate(..., verbose = TRUE)
 }
@@ -16,5 +16,5 @@ NULL
 Just a thin wrapper around \code{\link[=message]{message()}}
 }
 \description{
-Message to the user
+DEPRECATED: Message to the user
 }

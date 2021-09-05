@@ -27,4 +27,8 @@ Make felm slightly easier to use for someone who forgets to check things
 if (requireNamespace("lfe", quietly=TRUE)) {
   felm_strict(cyl ~ wt, mtcars)
 }
+
+NOTE: this function is soft-deprecated and will be removed sometime in the
+future. Use the `fixest` package instead.
+
 }

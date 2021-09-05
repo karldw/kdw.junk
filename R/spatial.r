@@ -15,7 +15,6 @@
 #'   sq(c(0.5, 1.7)), sq(c(3,3)), sq(c(-3, -3))))
 #' st_union_intersection(x)
 #' @seealso [sf::st_union()]
-#' @importFrom purrr "%>%"
 #' @export
 st_union_intersection <- function(x) {
   if (!requireNamespace("igraph", quietly=TRUE)) {
@@ -33,10 +32,10 @@ st_union_intersection <- function(x) {
   }
   # doesn't matter if x is already a geometry
   x <- sf::st_geometry(x)
-  unioned_list <- sf::st_intersects(x) %>%
-    igraph::graph_from_adj_list() %>%
-    igraph::components() %>%
-    igraph::groups() %>%
+  unioned_list <- sf::st_intersects(x) |>
+    igraph::graph_from_adj_list() |>
+    igraph::components() |>
+    igraph::groups() |>
     lapply(union_by_index, geom=x)
   do.call(c, unioned_list)
 }

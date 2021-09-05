@@ -70,6 +70,7 @@ hol_us_federal_holidays <- function(years) {
 #' @rdname holidays
 #' @export
 hol_new_years_day <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   years <- years[years > 1870]
   if(length(years) == 0) {
     return(structure(numeric(0L), class = "Date"))
@@ -82,6 +83,7 @@ hol_new_years_day <- function(years){
 #' @rdname holidays
 #' @export
 hol_martin_luther_king_day <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   years <- years[years > 1985]
   if(length(years) == 0) {
     return(structure(numeric(0L), class = "Date"))
@@ -103,6 +105,7 @@ hol_martin_luther_king_day <- function(years){
 #' @rdname holidays
 #' @export
 hol_george_washington_birthday <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   pre1971 <- years >= 1880 & years <= 1970
   recent  <- years > 1970
   if(any(pre1971)) {
@@ -125,6 +128,7 @@ hol_presidents_day <- hol_george_washington_birthday
 #' @rdname holidays
 #' @export
 hol_memorial_day <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   pre1971 <- years >= 1888 & years <= 1970
   recent  <- years > 1970
   if (any(pre1971)) {
@@ -143,6 +147,7 @@ hol_memorial_day <- function(years){
 #' @rdname holidays
 #' @export
 hol_independence_day <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   years <- years[years >= 1870]
   if (length(years) == 0) {
     return(structure(numeric(0), class="Date"))
@@ -155,6 +160,7 @@ hol_independence_day <- function(years){
 #' @rdname holidays
 #' @export
 hol_labor_day <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   years <- years[years >= 1894]
   if (length(years) == 0) {
     return(structure(numeric(0), class="Date"))
@@ -168,6 +174,7 @@ hol_labor_day <- function(years){
 #' @rdname holidays
 #' @export
 hol_columbus_day <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   pre1971 <- years >= 1934 & years <= 1970
   recent  <- years > 1970
   if (any(pre1971)) {
@@ -186,6 +193,7 @@ hol_columbus_day <- function(years){
 #' @rdname holidays
 #' @export
 hol_veterans_day <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   mondayYears <- years >= 1971 & years <= 1977
   nov11Years <- (years >= 1938 & years <= 1970) | years > 1977
   if (any(mondayYears)) {
@@ -205,6 +213,7 @@ hol_veterans_day <- function(years){
 #' @rdname holidays
 #' @export
 hol_thanksgiving_day <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   pre1939 <- years >= 1863 & years <= 1938
   is1939 <- years == 1939
   is1940 <- years == 1940
@@ -234,6 +243,7 @@ hol_thanksgiving_day <- function(years){
 #' @rdname holidays
 #' @export
 hol_christmas_day <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   years <- years[years >= 1870]
   if (length(years) == 0) {
     return(structure(numeric(0), class="Date"))
@@ -255,6 +265,7 @@ hol_good_friday <- function(years){
 #' @rdname holidays
 #' @export
 hol_inauguration_day <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   ## Inauguration Day for given years
   inaugDates <- c(17890430,
                   10000*(1793 + 4*(0:35))  + 304,
@@ -271,6 +282,7 @@ hol_inauguration_day <- function(years){
 #' @rdname holidays
 #' @export
 hol_easter <- function(years){
+  stop_if_not_installed("lubridate", "holiday functions require lubridate")
   G <- years %% 19
   C <- years %/% 100
   H <- (C - (C %/% 4) - ((8*C + 13) %/% 25) + 19*G + 15) %% 30

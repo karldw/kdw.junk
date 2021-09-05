@@ -17,6 +17,7 @@ test_that("truncate_bytes works for non-ascii", {
 
 test_that("rename_cols works for remote tables", {
   skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dplyr")
   remote_tbl <- dbplyr::memdb_frame(mpg = 1:5, cyl = 2:6)
   my_rename_remote <- rename_cols(remote_tbl,
     c("mpg_rename" = "mpg", "cyl_rename" = "cyl"))
@@ -27,6 +28,7 @@ test_that("rename_cols works for remote tables", {
 })
 
 test_that("rename_cols works for local tables", {
+  skip_if_not_installed("dplyr")
   my_rename <- rename_cols(mtcars,
     c("mpg_rename" = "mpg", "cyl_rename" = "cyl"))
   dplyr_rename <- dplyr::rename(mtcars, mpg_rename = mpg, cyl_rename = cyl)
@@ -41,14 +43,16 @@ test_that("make_better_names works for a small example", {
 })
 
 test_that("rename_cols works for single-col renames", {
+  skip_if_not_installed("dplyr")
   res <- rename_cols(mtcars, c("cyl2" = "cyl"))
   expected <- dplyr::rename(mtcars, cyl2 = cyl)
   expect_equal(expected, res)
 })
 
 test_that("rename_cols works for multi-col renames", {
+  skip_if_not_installed("dplyr")
   res <- rename_cols(mtcars, c("cyl2" = "cyl", "mpg2" = "mpg"))
   expected <- dplyr::rename(mtcars, cyl2 = cyl, mpg2 = mpg)
   expect_equal(expected, res)
 })
-# TODO: should test renaming remote tables. 
+# TODO: should test renaming remote tables.

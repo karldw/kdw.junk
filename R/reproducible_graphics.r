@@ -30,6 +30,7 @@
 #'
 #' @export
 save_plot <- function(plot, filename, scale_mult = 1, bg = "transparent", device=NULL, reproducible=NULL) {
+  stop_if_not_installed("ggplot2")
   force(plot)
   if (length(filename) > 1) {
     for (fl in filename) {
@@ -46,6 +47,7 @@ save_plot <- function(plot, filename, scale_mult = 1, bg = "transparent", device
       # Borrowed from https://stackoverflow.com/a/41878833
       panel.background      = ggplot2::element_rect(fill = "transparent", color = NA),
       plot.background       = ggplot2::element_rect(fill = "transparent", color = NA),
+      strip.background      = ggplot2::element_rect(fill = "transparent", color = NA),
       legend.background     = ggplot2::element_rect(fill = "transparent", color = NA),
       legend.key            = ggplot2::element_rect(fill = "transparent", color = NA),
       legend.box.background = ggplot2::element_rect(fill = "transparent", color = NA)
@@ -191,8 +193,6 @@ substitute_text <- function(infile, outfile, inregex, outregex) {
     gsub("/", "\\/", outregex, fixed=TRUE),
     '/"'
   )
-  # cat(sed_regex)
-  # cat("\n")
   # For reasons that aren't clear to me, stdout=outfile doesn't work.
   rc <- system2("sed", c(sed_regex, infile, " > ", outfile))
   if (rc != 0) {

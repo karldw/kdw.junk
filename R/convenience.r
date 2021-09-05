@@ -185,9 +185,8 @@ is.connection <- function(x) {
 #'
 #' @export
 read_dta <- function(...) {
-  if (!requireNamespace("haven", quietly=TRUE)) {
-    stop("read_dta requires the package haven")
-  }
+  stop_if_not_installed("haven", "read_dta requires the package haven")
+  stop_if_not_installed("dplyr", "read_dta requires the package dplyr")
   has_labels <- function(x) {
     "labels" %in% names(attributes(x))
   }
@@ -218,21 +217,7 @@ is_rstudio <- function() {
 }
 
 
-#' DEPRECATED: Read a dataset into memory, using extension to figure out file type
-#'
-#' @param file Filename to read
-#' @param ... Further arguments passed to the reader function
-#' @param guess_max Number of rows to scan to check types in readxl
-#'   (defaults to 1,000,000, which will be slower than readxl's default of 1000)
-#' @return The read data
-#'
-#' @export
-read_data <- function(file, ..., guess_max = 1e6) {
-  stop("read_data is deprecated. Use rio::import instead")
-}
-
-
-#' Message to the user
+#' DEPRECATED: Message to the user
 #'
 #' @param ... Arguments to `message`
 #' @param verbose Actually use `message`? (default TRUE)
@@ -240,6 +225,7 @@ read_data <- function(file, ..., guess_max = 1e6) {
 #' Just a thin wrapper around [message()]
 #' @export
 narrate <- function(..., verbose = TRUE) {
+  stop("narrate is deprecated. Use rlang::inform")
   if (verbose) {
     message(...)
   }
@@ -247,16 +233,19 @@ narrate <- function(..., verbose = TRUE) {
 }
 
 
-#' Turn a vector into one long string, used to generate messages
+#' DEPRECATED: Turn a vector into one long string, used to generate messages
 #'
 #' @param x Vector to convert
 #' @param quoted Should the individual elements have quotes around them?
 #' @param add_and Should we add an 'and' before the last element
 #' @return A string (length 1 character vector)
 #' @examples
+#' \dontrun{
 #' vec2string(c(1,2,3))  # "'1', '2', and '3'"
+#' }
 #' @export
 vec2string <- function(x, quoted = TRUE, add_and = TRUE) {
+  stop("vec2string is deprecated - use glue::glue instead")
   # Like the toString function, but better
   stopifnot(length(x) > 0, is.logical(quoted), is.logical(add_and))
   if (quoted) {
@@ -295,8 +284,14 @@ vec2string <- function(x, quoted = TRUE, add_and = TRUE) {
 #' if (requireNamespace("lfe", quietly=TRUE)) {
 #'   felm_strict(cyl ~ wt, mtcars)
 #' }
+#'
+#' NOTE: this function is soft-deprecated and will be removed sometime in the
+#' future. Use the `fixest` package instead.
+#'
 #' @export
 felm_strict <- function(formula, data, ..., dates_as_factor = TRUE, strict = TRUE) {
+  stop_if_not_installed("lfe", "felm_strict requires lfe")
+
   if (strict) {
     # Just like normal felm, but stricter about warnings.
     # (these are almost always a serious problem and should be treated as errors)
@@ -309,6 +304,7 @@ felm_strict <- function(formula, data, ..., dates_as_factor = TRUE, strict = TRU
   }
   model_data <- stats::model.frame(formula, data)
   if (dates_as_factor) {
+    stop_if_not_installed("dplyr", "felm_strict requires dplyr when dates_as_factor is true")
     # Force date variables to be factor if they're Dates and in the formula
     data <- dplyr::mutate_if(data, is_date, as.factor)
   }
@@ -334,6 +330,7 @@ felm_strict <- function(formula, data, ..., dates_as_factor = TRUE, strict = TRU
 #' @export
 truncate_bytes <- function(x, max_len = Inf) {
   stopifnot(length(max_len) == 1L || length(max_len) == length(x), !anyNA(max_len), all(max_len >= 0), !anyNA(x))
+  stop_if_not_installed("stringi")
   if (all(stringi::stri_numbytes(x) < max_len)) {
     return(x)
   }
@@ -416,6 +413,7 @@ configure_tikzDevice <- function(font = "Libertinus Serif", cache_dir = "~/.R") 
 #' rename_cols(mtcars, cols_to_rename)
 #' @export
 rename_cols <- function(.tbl, .vars, strict = TRUE) {
+  stop_if_not_installed("dplyr")
   tbl_names <- colnames(.tbl)
   old_names <- unname(.vars)
   if ((! purrr::is_bare_character(.vars)) ||
@@ -479,6 +477,10 @@ memory_limit <- function(size = NA) {
   invisible(limit)
 }
 
+.tidy_gsub <- function(x, pattern, replacement, fixed=FALSE) {
+  gsub(pattern, replacement, x, fixed=fixed, perl=!fixed)
+}
+
 #' Make names nicer to work with
 #'
 #' @param x A character vector of names
@@ -499,23 +501,24 @@ memory_limit <- function(size = NA) {
 #' make_better_names(c("", "x", "X", "x_1"))
 #' @export
 make_better_names <- function(x) {
-  `.` <- NULL # make R CMD CHECK happy
-  better_names <- gsub("%", "pct", x, fixed=TRUE) %>%
-    gsub("$M", "mn", ., fixed=TRUE) %>%
-    gsub("$B", "bn", ., fixed=TRUE) %>%
-    gsub("$T", "tn", ., fixed=TRUE) %>%
-    make.names() %>%
-    tolower() %>%
-    gsub(".", "_", ., fixed=TRUE) %>%
-    gsub("_+", "_", ., perl=TRUE) %>%
-    gsub("^_|_$", "", ., perl=TRUE)
+  better_names <- x |>
+    .tidy_gsub("%", "pct", fixed=TRUE) |>
+    .tidy_gsub("$M", "mn", fixed=TRUE) |>
+    .tidy_gsub("$B", "bn", fixed=TRUE) |>
+    .tidy_gsub("$T", "tn", fixed=TRUE) |>
+    make.names() |>
+    tolower() |>
+    .tidy_gsub(".", "_", fixed=TRUE) |>
+    .tidy_gsub("_+", "_") |>
+    .tidy_gsub("^_|_$", "")
   loop_count <- 0L
   while (anyDuplicated(better_names) != 0) {
     loop_count <- loop_count + 1L
     if (loop_count > 100L) {
       stop("Failed to make names unique!")
     }
-    better_names <- gsub(".", "_", make.names(better_names, unique=TRUE), fixed=TRUE)
+    better_names <- make.names(better_names, unique=TRUE) |>
+      .tidy_gsub(".", "_", fixed=TRUE)
   }
   better_names
 }
@@ -633,7 +636,7 @@ detect_function_conflicts <- function() {
     Filter(Negate(is.null), x)
   }
   conflict_message <- function(conflict_funs) {
-    pkgs <- lapply(conflict_funs, function(x) gsub("^package:", "", x))
+    pkgs <- lapply(conflict_funs, function(x) .tidy_gsub(x, "^package:", ""))
     winner <- lapply(pkgs, function(x) x[1])
     others <- lapply(pkgs, function(x) x[-1])
     msg <- vector(length=length(winner), mode="character")
@@ -658,4 +661,11 @@ detect_function_conflicts <- function() {
   msg <- conflict_message(conflict_funs)
   message(msg)
   invisible(conflict_funs)
+}
+
+
+stop_if_not_installed <- function(pkg_name, err_msg = paste(pkg_name, "is required")) {
+  if (!requireNamespace(pkg_name, quietly=TRUE)) {
+    stop(err_msg, .call=FALSE)
+  }
 }

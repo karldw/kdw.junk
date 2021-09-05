@@ -17,49 +17,18 @@ get_cores <- function(max_cores = 4L) {
 }
 
 
-#' DEPRECATED: Run lapply on multiple cores with mclapply
-#'
-#' @param X Argument to FUN to iterate over
-#' @param FUN Function to apply
-#' @param ... Other arguments passed to `FUN`
-#' @param mc.cores Number of cores to use. (Default of NULL tries to guess.)
-#' @return The result, as if passed to [lapply()]
-#'
-#' This is now just a thin wrapper around furrr::future_map. You shou
-#'
-#' @export
-lapply_parallel <- function(X, FUN, ..., mc.cores = NULL) {
-  stop("lapply_parallel() is deprecated. Use the more powerful furrr::future_map() instead.")
-}
-
-
-#' DEPRECATED: Run lapply then bind_rows, with multicore
-#'
-#' @param X Argument to FUN to iterate over
-#' @param FUN Function to apply
-#' @param ... Other arguments passed to `FUN`
-#' @param lapply_id If not NULL, create a column with the name provided by lapply_id to
-#'   identify the `X` value used.
-#' @param mc.cores Number of cores to use. (Default of NULL tries to guess; see [get_cores])
-#' @return The result, as if passed to [lapply()]
-#' @seealso [purrr::map_df()], [dplyr::bind_rows()]
-#' @importFrom rlang ":="
-#' @export
-lapply_bind_rows <- function(X, FUN, ..., lapply_id = NULL, mc.cores = NULL) {
-  stop("lapply_bind_rows() is deorecated. Use the more powerful furrr::future_dfr() instead.")
-}
-
-
 .bind_rows_add_id <- function(lst, X, lapply_id = NULL) {
   # Dispatch based on the class of the first element of the list
   if (!rlang::is_list(lst)) {
     stop("This function is meant to be called on lists.")
   }
+  stop_if_not_installed("dplyr")
   UseMethod(".bind_rows_add_id", lst[[1]])
 }
 
 
 .bind_rows_add_id.data.frame <- function(lst, X, lapply_id = NULL) {
+  `:=` <- NULL # make R check happy
   if (is.null(lapply_id)) {
     out <- dplyr::bind_rows(lst)
   } else {
@@ -74,6 +43,8 @@ lapply_bind_rows <- function(X, FUN, ..., lapply_id = NULL, mc.cores = NULL) {
 
 
 .bind_rows_add_id.sf <- function(lst, X, lapply_id = NULL) {
+  stop_if_not_installed("sf")
+  `:=` <- NULL # make R check happy
   # bind_rows doesn't work well for sf
   out <- rbind(lst)
   if (! is.null(lapply_id)) {
@@ -95,6 +66,7 @@ lapply_bind_rows <- function(X, FUN, ..., lapply_id = NULL, mc.cores = NULL) {
   # Then we use union_all, which translates to SQL's UNION ALL, to bind the tables
   # into one. union_all only takes two tables, so use Reduce to bring them all
   # together.
+  `:=` <- NULL # make R check happy
   .add_src_id <- function(idx) {
     if (is.atomic(X)) {
       # In this case, add the value of X for the index

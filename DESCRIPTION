@@ -1,10 +1,10 @@
 Package: kdw.junk
 Title: Miscellaneous Functions Karl Found Useful
-Version: 0.0.35
-Date: 2021-06-21
+Version: 0.0.36
+Date: 2021-09-05
 Authors@R: person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("aut", "cre"))
 Description: A variety of functions, mostly interacting with the tidyverse.
-Depends: R (>= 3.3.0)
+Depends: R (>= 4.0.0)
 License: Mozilla Public License 2.0
 URL: https://github.com/karldw/kdw.junk/
 BugReports: https://github.com/karldw/kdw.junk/issues/
@@ -14,27 +14,28 @@ RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 SystemRequirements: `sed` (only for reproducible graphics)
 Imports:
-    dplyr,
     glue,
     purrr,
     rlang,
-    tidyselect,
 Suggests:
     binsreg,
+    data.table,
     DBI,
     dbplyr,
-    data.table,
+    dplyr,
     ggplot2,
     haven,
     igraph,
     jsonlite,
     lfe,
     lubridate,
+    ragg,
     rmarkdown,
     RPostgres,
     RSQLite,
     sf,
     stringi,
+    tidyselect,
     testthat,
     tibble,
     tikzDevice (>= 0.12.2),

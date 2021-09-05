@@ -2,7 +2,7 @@
 % Please edit documentation in R/update_R_packages.r
 \name{update_packages}
 \alias{update_packages}
-\title{Update installed packages}
+\title{DEPRECATED: Update installed packages}
 \usage{
 update_packages(repos = getOption("repos"), checkBuilt = TRUE, verbose = TRUE)
 }
@@ -21,5 +21,5 @@ This version of update_packages goes the extra step of reinstalling all packages
 depend on Rcpp whenever Rcpp is updated.
 }
 \description{
-Update installed packages
+DEPRECATED: Update installed packages
 }

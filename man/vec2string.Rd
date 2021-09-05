@@ -2,7 +2,7 @@
 % Please edit documentation in R/convenience.r
 \name{vec2string}
 \alias{vec2string}
-\title{Turn a vector into one long string, used to generate messages}
+\title{DEPRECATED: Turn a vector into one long string, used to generate messages}
 \usage{
 vec2string(x, quoted = TRUE, add_and = TRUE)
 }
@@ -17,8 +17,10 @@ vec2string(x, quoted = TRUE, add_and = TRUE)
 A string (length 1 character vector)
 }
 \description{
-Turn a vector into one long string, used to generate messages
+DEPRECATED: Turn a vector into one long string, used to generate messages
 }
 \examples{
+\dontrun{
 vec2string(c(1,2,3))  # "'1', '2', and '3'"
+}
 }

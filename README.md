@@ -38,7 +38,6 @@ remotes ::install_github("karldw/kdw.junk")
 - `auto_render` – Render and automatically re-render `rmd`, `md`, or `tex` files.
 - `cite_attached_packages` – Generate biblatex citations for the attached packages.
 - `clear_all` – Delete everything in session.
-- `felm_strict` – Run `lfe::felm()` strictly.
 - `get_cores` – Get number of cores available, with a reasonable max.
 - `get_os` – Get current OS.
 - `install_lazy` – Install packages if necessary.
@@ -89,14 +88,13 @@ Does what is says on the box.
 
 ## Old functions
 
-### Hard-deprecated functions
-
+### Removed functions
 - `read_data` – use `rio::import()` instead.
 - `lapply_parallel` – use `furrr::future_map()` instead.
 - `lapply_bind_rows` – use `furrr::future_dfr()` instead.
 
 
-### Soft-deprecated functions
+### Hard-deprecated functions
 
 - `vec2string` – you're better off using `glue::glue()` most of the time.
 - `make_join_safer` – use [safejoin](https://github.com/moodymudskipper/safejoin) instead.
@@ -105,3 +103,9 @@ Does what is says on the box.
     - Defined a merge function that mirrored Stata's `merge`
 - `narrate` – use `rlang::inform()` instead.
 - `update_packages` – update packages and reinstall everything that depends on Rcpp when Rcpp is updated. Deprecated because that doesn't seem to be an issue anymore.
+
+
+### Soft-deprecated functions
+
+- `felm_strict` – Run `lfe::felm()` strictly.
+    - Use `fixest::feols()` instead

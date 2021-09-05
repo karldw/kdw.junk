@@ -2,7 +2,7 @@
 % Please edit documentation in R/joins.r
 \name{merge_stata}
 \alias{merge_stata}
-\title{Use dplyr to emulate Stata merges.}
+\title{DEPRECATED: Use dplyr to emulate Stata merges.}
 \usage{
 merge_stata(
   x,
@@ -35,5 +35,5 @@ cartesian product (equivalent to Stata's joinby).}
 \item{...}{Other arguments passed onto the dplyr *_join function.}
 }
 \description{
-Use dplyr to emulate Stata merges.
+DEPRECATED: Use dplyr to emulate Stata merges.
 }

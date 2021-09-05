@@ -1,5 +1,5 @@
 
-#' Update installed packages
+#' DEPRECATED: Update installed packages
 #'
 #' @param repos CRAN repo to use (defaults to Rstudio's)
 #' @param checkBuilt If TRUE, a package built under an earlier major.minor version of R
@@ -11,6 +11,7 @@
 #' depend on Rcpp whenever Rcpp is updated.
 #' @export
 update_packages <- function(repos = getOption("repos"), checkBuilt = TRUE, verbose = TRUE) {
+  stop("update_packages is deprecated. Use update.packages instead.")
   if (length(repos) > 1) {
     repos <- repos[1]
   }
@@ -28,20 +29,21 @@ update_packages <- function(repos = getOption("repos"), checkBuilt = TRUE, verbo
   if (! is.null(outdated)) {
     pkg_to_update <- as.character(outdated[, "Package"])
 
-    narrate("  Updating: ", paste(pkg_to_update, collapse = ", "), "\n", verbose = verbose)
+    message("  Updating: ", paste(pkg_to_update, collapse = ", "), "\n")
     if ("Rcpp" %in% pkg_to_update) {
       rcpp_deps <- find_rcpp_deps(repos = repos, verbose = verbose)
       additional_rcpp_updates <- setdiff(rcpp_deps, pkg_to_update)
       if (length(additional_rcpp_updates) > 0) {
-        narrate("  Also updating Rcpp-depending packages: ",
-          paste(additional_rcpp_updates, collapse = ", "), "\n", verbose = verbose)
+        message("  Also updating Rcpp-depending packages: ",
+          paste(additional_rcpp_updates, collapse = ", "), "\n"
+        )
       }
       pkg_to_update <- union(pkg_to_update, rcpp_deps)
     }
     utils::install.packages(pkg_to_update, repos = repos)
     ret <- pkg_to_update
   } else {
-    narrate("  R packages are up to date.", verbose = verbose)
+    message("  R packages are up to date.")
     ret <- character(0)
   }
   invisible(ret)
@@ -81,9 +83,9 @@ find_rcpp_deps <- function(repos = getOption("repos", default = "https://cran.rs
 
   other <- setdiff(rcppset, AP)
   if (length(other) > 0) {
-    narrate("\n\n  There are possibly local / github packages that depend on Rcpp.\n",
+    message("\n\n  There are possibly local / github packages that depend on Rcpp.\n",
       "Please update them manually.\n ",
-      dput(other), verbose = verbose)
+      dput(other))
   }
   return(onCRAN)
 }

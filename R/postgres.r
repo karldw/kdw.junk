@@ -9,17 +9,19 @@
 #' Note that this is much more expensive than `explain()`
 #' @export
 explain_analyze <- function(x, ...) {
-    # Just like dplyr::explain, but pipe-able and optionally running EXPLAIN ANALYZE
-    force(x)
-    stopifnot('tbl_sql' %in% class(x))
-    dplyr::show_query(x)
-    message("\n")
-    exsql <- dbplyr::build_sql(dbplyr::sql('EXPLAIN ANALYZE '), dbplyr::sql_render(x))
-    expl_raw <- DBI::dbGetQuery(x$src$con, exsql)
-    expl <- paste(expl_raw[[1]], collapse = "\n")
+  stop_if_not_installed("dplyr")
+  stop_if_not_installed("dbplyr")
+  # Just like dplyr::explain, but pipe-able and optionally running EXPLAIN ANALYZE
+  force(x)
+  stopifnot('tbl_sql' %in% class(x))
+  dplyr::show_query(x)
+  message("\n")
+  exsql <- dbplyr::build_sql(dbplyr::sql('EXPLAIN ANALYZE '), dbplyr::sql_render(x))
+  expl_raw <- DBI::dbGetQuery(x$src$con, exsql)
+  expl <- paste(expl_raw[[1]], collapse = "\n")
 
-    message("<PLAN>\n", expl)
-    invisible(x)
+  message("<PLAN>\n", expl)
+  invisible(x)
 }
 
 
@@ -39,6 +41,7 @@ explain_analyze <- function(x, ...) {
 #' @export
 pg_add_index <- function(con, table_name, indexed_col, unique_index = FALSE,
                          drop_existing = FALSE) {
+  stop_if_not_installed("DBI")
   # This function is here so I don't have to remember the SQL index syntax and so I
   # don't do anything too dumb. However, it definitely isn't safe or sanitized.
   # Obviously don't expose it to anyone malicious.
@@ -89,6 +92,7 @@ pg_add_index <- function(con, table_name, indexed_col, unique_index = FALSE,
 #' @return Nothing
 #' @noRd
 .pg_assert_existence <- function(con, table_name, col_name = NULL) {
+  stop_if_not_installed("DBI")
   # TODO: can I make this work for temporary tables?
   if (! DBI::dbExistsTable(con, table_name)) {
     err_msg <- sprintf("Table name '%s' is not in the database", table_name)
@@ -99,7 +103,7 @@ pg_add_index <- function(con, table_name, indexed_col, unique_index = FALSE,
     if(! all(col_name %in% known_cols)) {
       unknown_cols <- setdiff(col_name, known_cols)
       column_columns <- if (length(unknown_cols) > 1) "Columns" else "Column"
-      unknown_cols_str <- vec2string(unknown_cols)
+      unknown_cols_str <- paste(unknown_cols, collapse=", ")
       err_msg <- sprintf("%s %s not found in table '%s'.",
                          column_columns, unknown_cols_str, table_name)
       stop(err_msg)
@@ -119,6 +123,7 @@ pg_add_index <- function(con, table_name, indexed_col, unique_index = FALSE,
 #'
 #' @export
 pg_vacuum <- function(con, table_name = NULL, analyze = TRUE) {
+  stop_if_not_installed("DBI")
   if (analyze) {
     sql_cmd <- "VACUUM FREEZE ANALYZE"
   } else {
@@ -145,6 +150,7 @@ pg_vacuum <- function(con, table_name = NULL, analyze = TRUE) {
 #'
 #' @export
 pg_add_primary_key <- function(con, table_name, key_col) {
+  stop_if_not_installed("DBI")
   stopifnot(length(table_name) == 1, length(key_col) >= 1)
   existing_index <- pg_add_index(con, table_name, key_col, unique_index = TRUE)
   sql_cmd <- DBI::sqlInterpolate(con,
@@ -168,6 +174,7 @@ pg_add_primary_key <- function(con, table_name, key_col) {
 #'
 #' @export
 pg_add_foreign_key <- function(con, table_name, column_name, reftable, refcolumn) {
+  stop_if_not_installed("DBI")
   .pg_assert_existence(con, table_name, column_name)
   .pg_assert_existence(con, reftable, refcolumn)
   sql_cmd <- DBI::sqlInterpolate(con,

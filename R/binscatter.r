@@ -24,12 +24,14 @@
 #' }
 #' @export
 binscatter <- function(formula, data, x = NULL, ..., weights = NULL) {
-  if (!requireNamespace("binsreg", quietly=TRUE)) {
-    stop("binscatter() relies on the binsreg package. Please install it.")
-  }
-  if (!requireNamespace("lfe", quietly=TRUE)) {
-    stop("binscatter() relies on the lfe package. Please install it.")
-  }
+  stop_if_not_installed(
+    "binsreg",
+    "binscatter() relies on the binsreg package. Please install it."
+  )
+  stop_if_not_installed(
+    "lfe",
+    "binscatter() relies on the lfe package. Please install it."
+  )
   res <- lfe::felm(formula, data, weights=weights, keepCX=TRUE, nostats=TRUE)
   resid_y <- res$resid
   y_name <- colnames(res$cY)
